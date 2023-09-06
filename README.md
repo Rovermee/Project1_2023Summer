@@ -1,2 +1,4 @@
-# Project1_2023Summer
-A software for images and videos processing.
+直接启动main.py即可
+登录界面账户为seu
+              密码为seu2023
+关闭BGM只需将main.py中的MUSIC_PLAY参数设置为False

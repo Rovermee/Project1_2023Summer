@@ -1,0 +1,13 @@
+<RCC>
+  <qresource prefix="images">
+    <file>logossw.png</file>
+    <file>img/buttom_white/鐢靛瓙閿佸紑_electronic-locks-open.svg</file>
+    <file>img/buttom_white/github _github.svg</file>
+    <file>img/buttom_white/鍏抽棴_close.svg</file>
+    <file>img/buttom_white/閭欢鍙戦€佹垚鍔焈email-successfully.svg</file>
+    <file>img/buttom_white/寰俊_wechat.svg</file>
+    <file>img/buttom_white/鑴镐功_facebook.svg</file>
+    <file>img/buttom_white/鑻规灉_apple.svg</file>
+    <file>img/buttom_white/璋锋瓕_google.svg</file>
+  </qresource>
+</RCC>
