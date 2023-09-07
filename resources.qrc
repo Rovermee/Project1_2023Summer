@@ -1,5 +1,9 @@
 <RCC>
   <qresource prefix="images">
+    <file>brush.png</file>
+    <file>Eraser.png</file>
+    <file>palette.png</file>
+    <file>pen.png</file>
     <file>images/icons/cil-folder.png</file>
     <file>img/buttom_white/淇濆瓨_save.svg</file>
     <file>images/images/PyDracula.png</file>

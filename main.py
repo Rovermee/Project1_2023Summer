@@ -21,6 +21,7 @@ import platform
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////
 import cv2
+import  numpy as np
 import PySide6
 from PySide6 import  QtCore,QtWidgets
 from PySide6.QtGui import QIcon,QColor,QPixmap,QImage,QImageReader,Qt
@@ -108,7 +109,29 @@ class MainWindow(QMainWindow):
 
 
 
-        """图像显示区"""
+        """图像显示与处理区"""
+        widgets.horizontalSlider_rendering_1.valueChanged.connect(self.ImageRendering)
+        widgets.horizontalSlider_rendering_1.setValue(50)
+        widgets.horizontalSlider_rendering_2.valueChanged.connect(self.ImageRendering)
+        widgets.horizontalSlider_rendering_2.setValue(50)
+        widgets.horizontalSlider_rendering_3.valueChanged.connect(self.ImageRendering)
+        widgets.horizontalSlider_rendering_3.setValue(50)
+        widgets.horizontalSlider_rendering_4.valueChanged.connect(self.ImageRendering)
+        widgets.horizontalSlider_rendering_4.setValue(50)
+        widgets.horizontalSlider_rendering_5.valueChanged.connect(self.ImageRendering)
+        widgets.horizontalSlider_rendering_5.setValue(50)
+        widgets.horizontalSlider_rendering_6.valueChanged.connect(self.ImageRendering)
+        widgets.horizontalSlider_rendering_6.setValue(50)
+        widgets.horizontalSlider_rendering_7.valueChanged.connect(self.ImageRendering)
+        widgets.horizontalSlider_rendering_7.setValue(50)
+        widgets.horizontalSlider_rendering_8.valueChanged.connect(self.ImageRendering)
+        widgets.horizontalSlider_rendering_8.setValue(50)
+        widgets.horizontalSlider_rendering_9.valueChanged.connect(self.ImageRendering)
+        widgets.horizontalSlider_rendering_9.setValue(50)
+        widgets.horizontalSlider_rendering_10.valueChanged.connect(self.ImageRendering)
+        widgets.horizontalSlider_rendering_10.setValue(50)
+        widgets.horizontalSlider_rendering_11.valueChanged.connect(self.ImageRendering)
+        widgets.horizontalSlider_rendering_11.setValue(50)
         #widgets.label_pic_raw.setScaledContents(True)
         # EXTRA RIGHT BOX
         def openCloseRightBox():
@@ -186,26 +209,8 @@ class MainWindow(QMainWindow):
             UIFunctions.resetStyle(self, btnName)
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
 
-        if btnName == "pushButton_open_local_file":
-            try:
-                fname, _ = QFileDialog.getOpenFileName(self, 'open file', '/', "Image files (*.jpg *.gif *.png)")
-                self.ui.lineEdit_2.setText(fname)
-                self.image_path = fname
-                img = QImage(self.image_path)
-                pix = QPixmap.fromImage(img)
-                item = QGraphicsPixmapItem(pix)
-                scence = QGraphicsScene()
-                scence.addItem(item)
-                self.ui.graphicsView_4.setScene(scence)
-                self.ui.graphicsView_4.setDragMode(QGraphicsView.ScrollHandDrag)
-                self.ui.graphicsView_4.fitInView(QGraphicsPixmapItem(QPixmap(pix)))
 
 
-
-            except:
-                self.ui.lineEdit_2.setText("打开文件失败，可能是文件类型错误")
-
-        # PRINT BTN NAME
         print(f'Button "{btnName}" pressed!')
 
     def resizeEvent(self, event):
@@ -213,6 +218,7 @@ class MainWindow(QMainWindow):
         UIFunctions.resize_grips(self)
         if self.is_first_call == False:
             self.updateImageSize(self.image_path)
+            self.updateImageProcessed()
         if  self.is_first_call:
             self.is_first_call = False
 
@@ -237,17 +243,18 @@ class MainWindow(QMainWindow):
             self.image_state = "gray"
 
     def imageReader(self):
+        self.ui.lable_pic_pro.clear()
         options = QFileDialog.Options()
         file_path, _ = QFileDialog.getOpenFileName(self, 'Open Image', '',
                                                            'Image Files (*.png *.jpg *.bmp);;All Files (*)',
                                                            options=options)
         if file_path:
             self.image_path = file_path
-
+            print(file_path)
             if self.image_state == "color":
-                self.image = cv2.imread(self.image_path)
+                self.image = cv2.imdecode(np.fromfile(self.image_path, dtype=np.uint8), -1)
             elif self.image_state == "gray":
-                self.image = cv2.imread(self.image_path,cv2.IMREAD_GRAYSCALE )
+                self.image = cv2.imdecode(np.fromfile(self.image_path, dtype=np.uint8), 0)
 
             self.updateImageSize(self.image_path)
         else:
@@ -268,6 +275,29 @@ class MainWindow(QMainWindow):
             pixmap = QPixmap(img_path)
             self.ui.label_pic_raw.setPixmap(
                 pixmap.scaled(self.ui.label_pic_raw.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+    def updateImageProcessed(self):
+        height, width, channel = self.image_processed.shape
+        bytes_per_line = 3*width
+        qt_image = QImage(self.image_processed.data,width,height,bytes_per_line,QImage.Format_RGB888).rgbSwapped()
+        pixmap = QPixmap.fromImage(qt_image)
+        self.ui.lable_pic_pro.setPixmap(pixmap.scaled(self.ui.lable_pic_pro.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+
+
+    def ImageRendering(self):
+        sliderName = self.sender().objectName()
+        if  sliderName == "horizontalSlider_rendering_1":
+            pass
+        elif sliderName == "horizontalSlider_rendering_2":
+            brightness = widgets.horizontalSlider_rendering_2.value()
+            # 对图像进行处理
+            if self.image is not None:
+                img_hsv = cv2.cvtColor(self.image, cv2.COLOR_BGR2HSV)
+                dst = img_hsv.copy().astype(np.float32)
+                dst[:, :, 2] = dst[:, :, 2] * (1 + brightness / 100)  # 亮度调整
+                dst = np.clip(dst, 0, 255).astype(np.uint8)
+                dst = cv2.cvtColor(dst, cv2.COLOR_HSV2BGR)
+                self.image_processed = dst
+                self.updateImageProcessed()
 
 
 class MyMainForm(QMainWindow, Ui_MainWindow):
