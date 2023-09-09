@@ -60,6 +60,11 @@ class MainWindow(QMainWindow):
         self.image_state = "color"      #图片读入状态，默认为彩色图片
         self.image_path = None          #图片本地地址
         self.image_processed = None     #处理后的图片
+        self.image_Sized = None         #裁剪完的图片
+        self.image_forStyle = None      #滤镜处理完的图片
+        self.image_Printed = None       #涂鸦完成的图片
+
+
         # USE CUSTOM TITLE BAR | USE AS "False" FOR MAC OR LINUX
         # ///////////////////////////////////////////////////////////////
         Settings.ENABLE_CUSTOM_TITLE_BAR = True
@@ -110,8 +115,6 @@ class MainWindow(QMainWindow):
 
 
         """图像显示与处理区"""
-        widgets.horizontalSlider_rendering_1.valueChanged.connect(self.ImageRendering)
-        widgets.horizontalSlider_rendering_1.setValue(50)
         widgets.horizontalSlider_rendering_2.valueChanged.connect(self.ImageRendering)
         widgets.horizontalSlider_rendering_2.setValue(50)
         widgets.horizontalSlider_rendering_3.valueChanged.connect(self.ImageRendering)
@@ -121,17 +124,17 @@ class MainWindow(QMainWindow):
         widgets.horizontalSlider_rendering_5.valueChanged.connect(self.ImageRendering)
         widgets.horizontalSlider_rendering_5.setValue(50)
         widgets.horizontalSlider_rendering_6.valueChanged.connect(self.ImageRendering)
-        widgets.horizontalSlider_rendering_6.setValue(50)
+        widgets.horizontalSlider_rendering_6.setValue(180)
         widgets.horizontalSlider_rendering_7.valueChanged.connect(self.ImageRendering)
         widgets.horizontalSlider_rendering_7.setValue(50)
         widgets.horizontalSlider_rendering_8.valueChanged.connect(self.ImageRendering)
-        widgets.horizontalSlider_rendering_8.setValue(50)
+        widgets.horizontalSlider_rendering_8.setValue(0)
         widgets.horizontalSlider_rendering_9.valueChanged.connect(self.ImageRendering)
         widgets.horizontalSlider_rendering_9.setValue(50)
         widgets.horizontalSlider_rendering_10.valueChanged.connect(self.ImageRendering)
-        widgets.horizontalSlider_rendering_10.setValue(50)
+        widgets.horizontalSlider_rendering_10.setValue(0)
         widgets.horizontalSlider_rendering_11.valueChanged.connect(self.ImageRendering)
-        widgets.horizontalSlider_rendering_11.setValue(50)
+        widgets.horizontalSlider_rendering_11.setValue(0)
         #widgets.label_pic_raw.setScaledContents(True)
         # EXTRA RIGHT BOX
         def openCloseRightBox():
@@ -242,6 +245,147 @@ class MainWindow(QMainWindow):
             # 读取灰度图片
             self.image_state = "gray"
 
+    #亮度
+    def BrightnessChange(self, img, brightness):
+        brightness = brightness - 50
+        # 对图像进行处理
+        if img is not None:
+            img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+            dst = img_hsv.copy().astype(np.float32)
+            dst[:, :, 2] = dst[:, :, 2] * (1 + brightness / 100)  # 亮度调整
+            dst = np.clip(dst, 0, 255).astype(np.uint8)
+            dst = cv2.cvtColor(dst, cv2.COLOR_HSV2BGR)
+            return dst
+    #对比度
+    def Contrast_color(self, img, factor):
+        # 对每个通道应用对比度增强
+        b, g, r = cv2.split(img)
+        b_enhanced = cv2.addWeighted(b, 1 + factor / 100, b, 0, 0)
+        g_enhanced = cv2.addWeighted(g, 1 + factor / 100, g, 0, 0)
+        r_enhanced = cv2.addWeighted(r, 1 + factor / 100, r, 0, 0)
+        # 合并增强后的通道以获取彩色图像
+        enhanced_image = cv2.merge((b_enhanced, g_enhanced, r_enhanced))
+        return enhanced_image
+
+    def adjust_image(self, img, brightness, contrast, saturation, temperature, hue_factor):
+        hue_factor = (hue_factor-180)/10
+        adjusted_image = cv2.convertScaleAbs(img, alpha=contrast / 50.0, beta=brightness - 50)
+        hsv_image = cv2.cvtColor(adjusted_image, cv2.COLOR_BGR2HSV)
+        hue_channel = hsv_image[:, :, 0]
+        hue_channel = (hue_channel + hue_factor) % 180
+        hsv_image[:, :, 0] = hue_channel
+        h, s, v = cv2.split(hsv_image)
+        s = np.clip(s.astype(np.int32) + saturation - 50, 0, 255).astype(
+            np.uint8)  # clip函数用于截取数值，将小于0的数值截取为0，将大于255的数值截取为255
+        h = np.clip(h.astype(np.int32) + temperature - 50, 0, 255).astype(np.uint8)
+        adjusted_hsv_image = cv2.merge((h, s, v))
+
+        final_image = cv2.cvtColor(adjusted_hsv_image, cv2.COLOR_HSV2BGR)
+        return final_image
+
+    #色温
+    def color_temperature(self,img,level):
+        if img is not None:
+            level = level - 50
+            result = img.copy().astype(np.int16)  # 复制图像并转为int16数据类型防止数据溢出
+
+            result[..., 2] = np.clip(result[..., 2] + level, 0, 255)  # R通道
+            result[..., 1] = np.clip(result[..., 1] + level, 0, 255)  # G通道
+            result[..., 0] = np.clip(result[..., 0] - level, 0, 255)  # B通道
+
+            return result.astype(np.uint8)  # 转换回uint8数据类型
+    #锐化
+    def ImproveUSM(self, img, level):
+        """Ths = 30  # 锐化阈值
+        Factor = Factor-50
+        DiffMask = np.zeros(img.shape, img.dtype)
+        BlurImg = cv2.GaussianBlur(img, (9, 9), 0)
+        if len(img.shape) == 2:  # 灰度单通道
+            for i in range(img.shape[0]):
+                for j in range(img.shape[1]):
+                    Value_diff = abs(int(img[i, j]) - int(BlurImg[i, j]))
+                    DiffMask[i, j] = 1 if Value_diff < Ths else 0
+
+        elif len(img.shape) == 3:  # 三通道BGR
+            for i in range(img.shape[0]):
+                for j in range(img.shape[1]):
+                    for k in range(img.shape[2]):
+                        Value_diff = abs(int(img[i, j, k]) - int(BlurImg[i, j, k]))
+                        DiffMask[i, j, k] = 1 if Value_diff < Ths else 0
+
+        dst = cv2.addWeighted(img, 1 + Factor, BlurImg, -Factor, 0)
+        dst = np.where(DiffMask == 1, img, dst)
+        return dst"""
+        # 根据锐化系数level生成锐化卷积核
+        if level == 0:
+            return img  # 当level等于0时，不进行锐化
+        elif 0<level<25:
+            kernel = np.array([[0, 0, 0],
+                       [0, 1, 0],
+                       [0, 0, 0]])
+        elif 25<=level<50:
+            kernel = np.array([[0, -1, 0],
+                   [-1, 5, -1],
+                   [0, -1, 0]])
+        elif 50<=level<75:
+            kernel = np.array([[-1, -1, -1],
+                               [-1, 9, -1],
+                               [-1, -1, -1]])
+        else:
+            kernel = np.array([[1, 1, 1],
+                               [1, -7, 1],
+                               [1, 1, 1]])
+        # 使用filter2D函数应用卷积核来锐化图像
+        sharpened_img = cv2.filter2D(img, -1, kernel)
+        # 将结果图像的亮度缩放到0-255范围内
+        sharpened_img = cv2.convertScaleAbs(sharpened_img)
+        return sharpened_img
+    #阴影
+    def ShadowImg(self,img,level):
+        factor = level  # 范围在0到100之间的系数
+        # 调整阴影效果的强度
+        # 自适应阈值化
+        gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        thresh = cv2.adaptiveThreshold(gray_image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
+        dst = shadow_effect = cv2.addWeighted(img, 1 - factor / 100, cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR), factor / 100,0)
+        return dst
+    #颗粒
+    def Grainy(self, img, level):
+        level /= 2
+        if level > 50:
+            level = 50
+        if level < 0:
+            level = 0
+
+        noise = np.random.randint(-level, level + 1, img.shape, dtype=np.int32)
+        result = np.clip(img + noise, 0, 255).astype(np.uint8)  # 添加随机噪声
+        return result
+    #纹理
+    def texture_flatten(self, img, smoothing_level):
+        if smoothing_level<=25:
+            blurred_image = cv2.GaussianBlur(img, (5, 5), 0)  # 调整卷积核大小和标准差以控制模糊程度
+        elif smoothing_level<=50:
+            blurred_image = cv2.medianBlur(image, 5)  # 调整窗口大小以控制模糊程度
+        elif smoothing_level<=75:
+            kernel = np.array([[-1, -1, -1],
+                           [-1, 9, -1],
+                           [-1, -1, -1]])  # 自定义卷积核，可以调整以实现不同的纹理效果
+            blurred_image = cv2.filter2D(img, -1, kernel)
+        else:
+            blurred_image = cv2.Canny(img, 30, 70)  # 调整阈值以控制边缘检测的强度
+        return blurred_image
+    # 颗粒
+    def Grainy(self, src, level):
+        level /= 2
+        if level > 50:
+            level = 50
+        if level < 0:
+            level = 0
+
+        noise = np.random.randint(-level, level + 1, src.shape, dtype=np.int32)
+        result = np.clip(src + noise, 0, 255).astype(np.uint8)# 添加随机噪声
+
+        return result
     def imageReader(self):
         self.ui.lable_pic_pro.clear()
         options = QFileDialog.Options()
@@ -257,6 +401,8 @@ class MainWindow(QMainWindow):
                 self.image = cv2.imdecode(np.fromfile(self.image_path, dtype=np.uint8), 0)
 
             self.updateImageSize(self.image_path)
+            self.ImageRendering()
+            self.updateImageProcessed()
         else:
             QMessageBox.warning("错误","读取图片失败!!!")
 
@@ -272,32 +418,57 @@ class MainWindow(QMainWindow):
 
     def updateImageSize(self,img_path):
         if self.image is not None:
-            pixmap = QPixmap(img_path)
+            """pixmap = QPixmap(img_path)"""
+            height, width, channel = self.image.shape
+            bytes_per_line = 3 * width
+            qt_image = QImage(self.image.data, width, height, bytes_per_line,
+                              QImage.Format_RGB888).rgbSwapped()
+            pixmap = QPixmap.fromImage(qt_image)
+
             self.ui.label_pic_raw.setPixmap(
                 pixmap.scaled(self.ui.label_pic_raw.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
-    def updateImageProcessed(self):
-        height, width, channel = self.image_processed.shape
-        bytes_per_line = 3*width
-        qt_image = QImage(self.image_processed.data,width,height,bytes_per_line,QImage.Format_RGB888).rgbSwapped()
-        pixmap = QPixmap.fromImage(qt_image)
-        self.ui.lable_pic_pro.setPixmap(pixmap.scaled(self.ui.lable_pic_pro.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
 
+    def updateImageProcessed(self):
+        if self.image_processed is not None:
+            height, width, channel = self.image_processed.shape
+            bytes_per_line = 3*width
+            qt_image = QImage(self.image_processed.data,width,height,bytes_per_line,QImage.Format_RGB888).rgbSwapped()
+            pixmap = QPixmap.fromImage(qt_image)
+            self.ui.lable_pic_pro.setPixmap(
+                pixmap.scaled(self.ui.lable_pic_pro.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
 
     def ImageRendering(self):
-        sliderName = self.sender().objectName()
-        if  sliderName == "horizontalSlider_rendering_1":
-            pass
-        elif sliderName == "horizontalSlider_rendering_2":
-            brightness = widgets.horizontalSlider_rendering_2.value()
-            # 对图像进行处理
-            if self.image is not None:
-                img_hsv = cv2.cvtColor(self.image, cv2.COLOR_BGR2HSV)
-                dst = img_hsv.copy().astype(np.float32)
-                dst[:, :, 2] = dst[:, :, 2] * (1 + brightness / 100)  # 亮度调整
-                dst = np.clip(dst, 0, 255).astype(np.uint8)
-                dst = cv2.cvtColor(dst, cv2.COLOR_HSV2BGR)
-                self.image_processed = dst
-                self.updateImageProcessed()
+
+       if self.image is not None:
+            img = self.image.copy()
+
+            if (self.ui.horizontalSlider_rendering_2.value() != 50) or (self.ui.horizontalSlider_rendering_5.value() != 50) or (self.ui.horizontalSlider_rendering_4.value() != 50) or (self.ui.horizontalSlider_rendering_7.value() != 50) or (self.ui.horizontalSlider_rendering_6.value() != 180):
+                brightness = self.ui.horizontalSlider_rendering_2.value()
+                contrast = self.ui.horizontalSlider_rendering_5.value()
+                saturation = self.ui.horizontalSlider_rendering_4.value()
+                temperature = self.ui.horizontalSlider_rendering_7.value()
+                color_tone = self.ui.horizontalSlider_rendering_6.value()
+                img = self.adjust_image(img,brightness,contrast,saturation,temperature,color_tone)
+
+
+            if self.ui.horizontalSlider_rendering_8.value() != 0:
+                USM = widgets.horizontalSlider_rendering_8.value()
+                img = self.ImproveUSM(img,USM)
+            if self.ui.horizontalSlider_rendering_9.value() != 0:
+                level = self.ui.horizontalSlider_rendering_9.value()
+                img = self.Grainy(img,level)
+            if self.ui.horizontalSlider_rendering_10.value() != 0:
+                level = widgets.horizontalSlider_rendering_10.value()
+                img = self.texture_flatten(img,level)
+            if self.ui.horizontalSlider_rendering_11.value() != 0:
+                level = widgets.horizontalSlider_rendering_11.value()
+                img = self.ShadowImg(img,level)
+
+            self.image_processed = img
+            self.updateImageProcessed()
+
+
+
 
 
 class MyMainForm(QMainWindow, Ui_MainWindow):
