@@ -407,7 +407,6 @@ class MainWindow(QMainWindow):
             QMessageBox.warning("错误","读取图片失败!!!")
 
     def imageSaver(self):
-        self.image_processed = self.image
         if self.image_processed is not None:
             save_path, _ = QFileDialog.getSaveFileName(self, 'Save Image', '',
                                                        'Image Files (*.png *.jpg *.bmp);;All Files (*)')
