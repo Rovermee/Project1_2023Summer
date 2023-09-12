@@ -80,14 +80,18 @@ class MainWindow(QMainWindow):
         self.SpecialEffect = False
         self.SpecialEffectArea = None
         self.img_transpancy = None
-
+        self.img_transpancy2 = None
         self.drawing = False  # 是否开始绘制
         self.tpPointsChoose = []  # 用于存储多边形的顶点
         self.drawing = False  # 是否在绘制多边形
         self.tempFlag = False  # 是否按下右键
-
-
-
+        self.Drawing = False
+        self.processingend = False
+        self.rgbcolor = None
+        self.TextInsertStart = False
+        self.TextPoint = []
+        self.TextFlag = False
+        self.end = False
         widgets.lable_pic_pro.clicked.connect(self.handle_click)
         # USE CUSTOM TITLE BAR | USE AS "False" FOR MAC OR LINUX
         # ///////////////////////////////////////////////////////////////
@@ -135,6 +139,7 @@ class MainWindow(QMainWindow):
         widgets.pushButton_fileOpen.clicked.connect(self.imageReader)
         widgets.pushButton_fileSave.clicked.connect(self.imageSaver)
         widgets.pushButton_fileSave_2.clicked.connect(self.imageSaver)
+        widgets.pushButton_fileSave_3.clicked.connect(self.imageSaver)
         widgets.pushButton_Resize.clicked.connect(self.ChangeImageSize)
         widgets.radioButton_Fangshe.clicked.connect(self.Transform)
         widgets.radioButton_Toushi.clicked.connect(self.Transform)
@@ -144,7 +149,7 @@ class MainWindow(QMainWindow):
         widgets.radioButton_NONE.clicked.connect(self.SpecialEffectStart)
         widgets.pushButton_2.clicked.connect(self.AreaSpecialEffectStart)
         widgets.pushButton_3.clicked.connect(self.AreaSpecialEffectStart)
-        widgets.pushButton_4.clicked.connect(self.AreaSpecialEffectStart)
+        widgets.pushButton_4.clicked.connect(self.TextInsert)
 
         """图像显示与处理区"""
         widgets.horizontalSlider_rendering_2.valueChanged.connect(self.ImageRendering)
@@ -179,6 +184,10 @@ class MainWindow(QMainWindow):
         widgets.horizontalSlider_5.setValue(50)
         widgets.horizontalSlider_6.setValue(50)
         widgets.horizontalSlider_7.setValue(50)
+        widgets.horizontalSlider_TextSize.valueChanged.connect(self.TextInsert)
+        widgets.horizontalSlider_TextSize.setValue(50)
+        widgets.horizontalSlider_TextSize_2.valueChanged.connect(self.TextInsert)
+        widgets.horizontalSlider_TextSize_2.setValue(50)
         """风格区"""
         widgets.Button_Style_1.clicked.connect(self.ChangeImageStyle)
         widgets.Button_Style_2.clicked.connect(self.ChangeImageStyle)
@@ -197,9 +206,8 @@ class MainWindow(QMainWindow):
         widgets.Button_Style_15.clicked.connect(self.ChangeImageStyle)
         widgets.Button_Style_15.setChecked(True)
         widgets.radioButton_color.setChecked(True)
-
-
-
+        widgets.pushButton_colorbutton.clicked.connect(self.openColorDialog)
+        widgets.pushButton_5.clicked.connect(self.EndText)
 
 
 
@@ -242,6 +250,12 @@ class MainWindow(QMainWindow):
             if len(self.Points)==self.TransformPointNum:
                 self.TransformStart = True
                 self.ImageRendering()
+        if self.TextInsertStart == True:
+            self.TextPoint.append((x,y))
+            self.TextInsertStart = False
+            self.TextFlag = True
+            self.ImageRendering()
+
 
     def filter_convex_lens(self,img,center_x, center_y, scale, fixed_radius):
         row, col, channel = img.shape
@@ -404,26 +418,6 @@ class MainWindow(QMainWindow):
             return result.astype(np.uint8)  # 转换回uint8数据类型
     #锐化
     def ImproveUSM(self, img, level):
-        """Ths = 30  # 锐化阈值
-        Factor = Factor-50
-        DiffMask = np.zeros(img.shape, img.dtype)
-        BlurImg = cv2.GaussianBlur(img, (9, 9), 0)
-        if len(img.shape) == 2:  # 灰度单通道
-            for i in range(img.shape[0]):
-                for j in range(img.shape[1]):
-                    Value_diff = abs(int(img[i, j]) - int(BlurImg[i, j]))
-                    DiffMask[i, j] = 1 if Value_diff < Ths else 0
-
-        elif len(img.shape) == 3:  # 三通道BGR
-            for i in range(img.shape[0]):
-                for j in range(img.shape[1]):
-                    for k in range(img.shape[2]):
-                        Value_diff = abs(int(img[i, j, k]) - int(BlurImg[i, j, k]))
-                        DiffMask[i, j, k] = 1 if Value_diff < Ths else 0
-
-        dst = cv2.addWeighted(img, 1 + Factor, BlurImg, -Factor, 0)
-        dst = np.where(DiffMask == 1, img, dst)
-        return dst"""
         # 根据锐化系数level生成锐化卷积核
         if level == 0:
             return img  # 当level等于0时，不进行锐化
@@ -519,11 +513,20 @@ class MainWindow(QMainWindow):
                 QMessageBox.warning(self,"错误","图片未进行修改！！！")
         elif btnName == "pushButton_fileSave_2":
             if self.img_transpancy is not None:
-
                 save_path, _ = QFileDialog.getSaveFileName(self, 'Save Image', '',
                                                            'Image Files (*.png *.jpg *.bmp);;All Files (*)')
                 if save_path:
                     cv2.imwrite(save_path,self.img_transpancy)
+                else:
+                    QMessageBox.warning(self, "错误", "图片未进行修改！！！")
+
+        elif btnName == "pushButton_fileSave_3":
+            if self.img_transpancy2 is not  None:
+                save_path, _ = QFileDialog.getSaveFileName(self, 'Save Image', '',
+                                                           'Image Files (*.png *.jpg *.bmp);;All Files (*)')
+                if save_path:
+                    cv2.imwrite(save_path, self.img_transpancy2)
+
                 else:
                     QMessageBox.warning(self, "错误", "图片未进行修改！！！")
 
@@ -615,8 +618,6 @@ class MainWindow(QMainWindow):
             self.SpecialEffectArea = 2
         elif btnName == "pushButton_3":
             self.SpecialEffectArea = 3
-        elif btnName == "pushButton_4":
-            self.SpecialEffectArea = 4
         self.ImageRendering()
 
     def draw_ROI(self, event, x, y, flags, param):
@@ -627,7 +628,80 @@ class MainWindow(QMainWindow):
             self.drawing = True
             self.tempFlag = True  # 按下右键，表示多边形绘制完成
 
+    def compute_energy_matrix_modified(self, rect_roi):
+        gray = cv2.cvtColor(self.image2, cv2.COLOR_BGR2GRAY)
+        sobel_x = cv2.Sobel(gray,cv2.CV_64F,1,0,ksize=3)
+        sobel_y = cv2.Sobel(gray,cv2.CV_64F,0,1,ksize=3)
+        abs_sobel_x = cv2.convertScaleAbs(sobel_x)
+        abs_sobel_y = cv2.convertScaleAbs(sobel_y)
+        energy_matrix = cv2.addWeighted(abs_sobel_x, 0.5, abs_sobel_y, 0.5, 0)
+        x,y,w,h = rect_roi
+        energy_matrix[y:y+h, x:x+w] = 0
+        return energy_matrix
 
+    def remove_object(self, img, rect_roi):
+        num_seams = rect_roi[2] + 10
+        energy = self.compute_energy_matrix_modified(self.image2, rect_roi)
+
+        for i in range(num_seams):
+            seam = self.find_vertical_seam(self.image, energy)
+            self.image2 = self.remove_vertical_seam(self.image2, seam)
+            x,y,w,h = rect_roi
+            energy = self.compute_energy_matrix_modified(self.image, (x,y,w-i,h))
+            print('Number of seams removed =', i+1)
+
+        img_output = np.copy(self.image)
+        img_carved_backup = np.copy(self.image)
+
+        for i in range(num_seams):
+            seam = self.find_vertical_seam(self.image, energy)
+            self.image2 = self.remove_vertical_seam(self.image2, seam)
+            img_output = self.add_vertical_seam(img_output, seam, i)
+            energy = self.compute_energy_matrix(self.image2)
+            print('Number of seams added =', i+1)
+
+        print('Processing Complete!')
+        return img_output
+
+    def draw_rectangle(self,event, x, y, flags, params):
+        if event == cv2.EVENT_LBUTTONDOWN:
+            self.Drawing = True
+            self.x_init, self.y_init = x, y
+
+        elif event == cv2.EVENT_MOUSEMOVE:
+            if self.Drawing:
+                self.top_left_pt, self.bottom_right_pt = (self.x_init,self.y_init), (x,y)
+                self.image2[self.y_init:y, self.x_init:x] = 255 - self.img_orig[self.y_init:y, self.x_init:x]
+                cv2.rectangle(self.image2, self.top_left_pt, self.bottom_right_pt, (0,255,0), 2)
+
+        elif event == cv2.EVENT_LBUTTONUP:
+            self.Drawing = False
+            self.top_left_pt, self.bottom_right_pt = (self.x_init,self.y_init), (x,y)
+            self.image2[self.y_init:y, self.x_init:x] = 255 - self.image2[self.y_init:y, self.x_init:x]
+            cv2.rectangle(self.image2, self.top_left_pt, self.bottom_right_pt, (0,255,0), 2)
+            rect_final = (self.x_init, self.y_init, x-self.x_init, y-self.y_init)
+            img_output = self.remove_object(self.image2,img_orig, rect_final)
+            self.processingend = True
+            return  img_output
+
+    def openColorDialog(self):
+        color_dialog = QColorDialog(self)
+        color = color_dialog.getColor()
+
+        if color.isValid():
+            # 获取选中颜色的RGB值
+            red = color.red()
+            green = color.green()
+            blue = color.blue()
+            self.rgbcolor = (red,green,blue)
+            # 在控制台上打印RGB值
+            print(f'Selected Color (RGB): {red}, {green}, {blue}')
+
+    def TextInsert(self):
+        if self.ui.lineEdit_Text.text() != "":
+            self.TextInsertStart = True
+    def EndText(self):
+        self.TextInsertStart = False
     def ImageRendering(self):
 
        if self.image is not None:
@@ -817,10 +891,52 @@ class MainWindow(QMainWindow):
                     img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
                     cv2.destroyAllWindows()
 
-                elif self.SpecialEffectArea == 3:
-                    pass
-                elif self.SpecialEffectArea == 4:
-                    pass
+                if self.SpecialEffectArea == 3:
+                    """图像分割，分割的结果支持保存透明图像"""
+                    # 创建一个掩膜，用于存储分割结果
+                    mask = np.zeros(img.shape[:2], np.uint8)
+
+                    # 定义用于GrabCut算法的前景和背景模型
+                    bgdModel = np.zeros((1, 65), np.float64)
+                    fgdModel = np.zeros((1, 65), np.float64)
+
+                    # 选择矩形框，进行分割
+                    rect = cv2.selectROI(img)
+                    cv2.grabCut(img, mask, rect, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_RECT)
+
+                    # 将GrabCut的结果转换为二值图像，背景设为0，前景设为1
+                    mask = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
+                    mask = mask * 255
+
+                    # 创建一个与原始图像相同大小的透明图像
+                    transparent_image = np.zeros(img.shape, dtype=np.uint8)
+
+                    # 将透明图像的前景部分赋值为原始图像中的像素值，其余部分设置为透明
+                    transparent_image[:, :] = (img[:, :] * mask[:, :, np.newaxis])
+
+                    # 将原图中除了前景目标之外的其他像素设置为透明
+                    transparent_image[np.where((transparent_image == [0, 0, 0]).all(axis=2))] = [0, 0, 0]
+                    # 将BGR图像转换为BGRA图像
+                    bgra_image = cv2.cvtColor(transparent_image, cv2.COLOR_BGR2BGRA)
+
+                    # 找到原图像中颜色为(0, 0, 0)的像素，并将其的alpha通道设置为0
+                    mask = (transparent_image[:, :, 0] == 0) & (transparent_image[:, :, 1] == 0) & (
+                                transparent_image[:, :, 2] == 0)
+                    bgra_image[:, :, 3][mask] = 0
+                    img = transparent_image
+                    self.img_transpancy2 = bgra_image
+                    cv2.destroyAllWindows()
+
+            if self.TextFlag == True:
+
+                    coordinate = self.TextPoint
+                    size = int(self.ui.horizontalSlider_TextSize.value()/5)
+                    text = self.ui.lineEdit_Text.text()
+                    bond = int(self.ui.horizontalSlider_TextSize_2.value()/10)
+                    r=self.rgbcolor[0]
+                    g=self.rgbcolor[1]
+                    b=self.rgbcolor[2]
+                    cv2.putText(img,text,coordinate[0],cv2.FONT_HERSHEY_SIMPLEX,size,(b,g,r),bond)
 
             self.image_processed = img
             self.updateImageProcessed()
@@ -944,8 +1060,8 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
             QMessageBox.critical(self, "抱歉", "该功能暂时未开发")
 
         if btnName == "pushButton_2":
-            self.open_new_window()
-            """if (self.lineEdit.text() == self.account) and (self.lineEdit_2.text() == self.passward):
+
+            if (self.lineEdit.text() == self.account) and (self.lineEdit_2.text() == self.passward):
                 self.open_new_window()
 
             elif self.lineEdit.text() == "":
@@ -956,7 +1072,7 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
 
             else:
                 QMessageBox.warning(self, "警告", "密码错误或账户不存在")
-                self.lineEdit_2.clear()"""
+                self.lineEdit_2.clear()
 
 
 

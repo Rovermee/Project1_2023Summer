@@ -1878,7 +1878,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                       <string notr="true">background: transparent;</string>
                      </property>
                      <property name="currentIndex">
-                      <number>3</number>
+                      <number>0</number>
                      </property>
                      <widget class="QWidget" name="home">
                       <property name="styleSheet">
@@ -2669,7 +2669,7 @@ background-repeat: no-repeat;</string>
                                  <x>0</x>
                                  <y>0</y>
                                  <width>218</width>
-                                 <height>218</height>
+                                 <height>258</height>
                                 </rect>
                                </property>
                                <property name="styleSheet">
@@ -2999,7 +2999,7 @@ background-repeat: no-repeat;</string>
                                   <string notr="true">background-color: rgb(255, 238, 250);</string>
                                  </property>
                                  <property name="currentIndex">
-                                  <number>3</number>
+                                  <number>0</number>
                                  </property>
                                  <widget class="QWidget" name="tab_rendering">
                                   <property name="enabled">
@@ -3764,7 +3764,7 @@ font: 12pt &quot;黑体&quot;;</string>
                                      </property>
                                      <layout class="QVBoxLayout" name="verticalLayout_37">
                                       <item>
-                                       <layout class="QHBoxLayout" name="horizontalLayout_28">
+                                       <layout class="QHBoxLayout" name="horizontalLayout_28" stretch="4,1,4">
                                         <item>
                                          <widget class="QPushButton" name="pushButton_2">
                                           <property name="styleSheet">
@@ -3795,29 +3795,6 @@ font: 12pt &quot;黑体&quot;;</string>
                                           </property>
                                           <property name="text">
                                            <string>图像分割</string>
-                                          </property>
-                                         </widget>
-                                        </item>
-                                        <item>
-                                         <spacer name="horizontalSpacer_7">
-                                          <property name="orientation">
-                                           <enum>Qt::Horizontal</enum>
-                                          </property>
-                                          <property name="sizeHint" stdset="0">
-                                           <size>
-                                            <width>40</width>
-                                            <height>20</height>
-                                           </size>
-                                          </property>
-                                         </spacer>
-                                        </item>
-                                        <item>
-                                         <widget class="QPushButton" name="pushButton_4">
-                                          <property name="styleSheet">
-                                           <string notr="true">background-color: rgb(255, 170, 127);</string>
-                                          </property>
-                                          <property name="text">
-                                           <string>去除物体</string>
                                           </property>
                                          </widget>
                                         </item>
@@ -3863,6 +3840,187 @@ font: 12pt &quot;黑体&quot;;</string>
                                   <attribute name="title">
                                    <string>文字</string>
                                   </attribute>
+                                  <layout class="QHBoxLayout" name="horizontalLayout_37">
+                                   <item>
+                                    <widget class="QGroupBox" name="groupBox_7">
+                                     <property name="title">
+                                      <string/>
+                                     </property>
+                                     <layout class="QVBoxLayout" name="verticalLayout_39">
+                                      <item>
+                                       <layout class="QHBoxLayout" name="horizontalLayout_31">
+                                        <item>
+                                         <widget class="QLabel" name="label">
+                                          <property name="styleSheet">
+                                           <string notr="true">color: rgb(0, 0, 0);
+font: 12pt &quot;黑体&quot;;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string>内容：</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QLineEdit" name="lineEdit_Text">
+                                          <property name="styleSheet">
+                                           <string notr="true">color: rgb(0, 85, 255);</string>
+                                          </property>
+                                          <property name="placeholderText">
+                                           <string>请输入要插入的文字：</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </item>
+                                      <item>
+                                       <layout class="QHBoxLayout" name="horizontalLayout_33">
+                                        <item>
+                                         <widget class="QLabel" name="label_4">
+                                          <property name="styleSheet">
+                                           <string notr="true">color: rgb(0, 0, 0);
+font: 12pt &quot;黑体&quot;;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string>字体大小：</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QSlider" name="horizontalSlider_TextSize">
+                                          <property name="orientation">
+                                           <enum>Qt::Horizontal</enum>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </item>
+                                      <item>
+                                       <layout class="QHBoxLayout" name="horizontalLayout_36">
+                                        <item>
+                                         <widget class="QLabel" name="label_11">
+                                          <property name="styleSheet">
+                                           <string notr="true">color: rgb(0, 0, 0);
+font: 12pt &quot;黑体&quot;;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string>字体粗细：</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QSlider" name="horizontalSlider_TextSize_2">
+                                          <property name="orientation">
+                                           <enum>Qt::Horizontal</enum>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </item>
+                                      <item>
+                                       <layout class="QHBoxLayout" name="horizontalLayout_34" stretch="4,1,4">
+                                        <item>
+                                         <widget class="QLabel" name="label_5">
+                                          <property name="styleSheet">
+                                           <string notr="true">color: rgb(0, 0, 0);
+font: 12pt &quot;黑体&quot;;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string>颜色：</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <spacer name="horizontalSpacer_4">
+                                          <property name="orientation">
+                                           <enum>Qt::Horizontal</enum>
+                                          </property>
+                                          <property name="sizeHint" stdset="0">
+                                           <size>
+                                            <width>40</width>
+                                            <height>20</height>
+                                           </size>
+                                          </property>
+                                         </spacer>
+                                        </item>
+                                        <item>
+                                         <widget class="QPushButton" name="pushButton_colorbutton">
+                                          <property name="styleSheet">
+                                           <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(9, 41, 4, 255), stop:0.085 rgba(2, 79, 0, 255), stop:0.19 rgba(50, 147, 22, 255), stop:0.275 rgba(236, 191, 49, 255), stop:0.39 rgba(243, 61, 34, 255), stop:0.555 rgba(135, 81, 60, 255), stop:0.667 rgba(121, 75, 255, 255), stop:0.825 rgba(164, 255, 244, 255), stop:0.885 rgba(104, 222, 71, 255), stop:1 rgba(93, 128, 0, 255));</string>
+                                          </property>
+                                          <property name="text">
+                                           <string>颜色</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </item>
+                                      <item>
+                                       <layout class="QHBoxLayout" name="horizontalLayout_35">
+                                        <item>
+                                         <spacer name="horizontalSpacer_5">
+                                          <property name="orientation">
+                                           <enum>Qt::Horizontal</enum>
+                                          </property>
+                                          <property name="sizeHint" stdset="0">
+                                           <size>
+                                            <width>40</width>
+                                            <height>20</height>
+                                           </size>
+                                          </property>
+                                         </spacer>
+                                        </item>
+                                        <item>
+                                         <widget class="QPushButton" name="pushButton_4">
+                                          <property name="styleSheet">
+                                           <string notr="true">background-color: rgb(52, 59, 72);</string>
+                                          </property>
+                                          <property name="text">
+                                           <string>开始插入</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <spacer name="horizontalSpacer_7">
+                                          <property name="orientation">
+                                           <enum>Qt::Horizontal</enum>
+                                          </property>
+                                          <property name="sizeHint" stdset="0">
+                                           <size>
+                                            <width>40</width>
+                                            <height>20</height>
+                                           </size>
+                                          </property>
+                                         </spacer>
+                                        </item>
+                                        <item>
+                                         <widget class="QPushButton" name="pushButton_5">
+                                          <property name="styleSheet">
+                                           <string notr="true">background-color: rgb(52, 59, 72);</string>
+                                          </property>
+                                          <property name="text">
+                                           <string>插入结束</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <spacer name="horizontalSpacer_8">
+                                          <property name="orientation">
+                                           <enum>Qt::Horizontal</enum>
+                                          </property>
+                                          <property name="sizeHint" stdset="0">
+                                           <size>
+                                            <width>40</width>
+                                            <height>20</height>
+                                           </size>
+                                          </property>
+                                         </spacer>
+                                        </item>
+                                       </layout>
+                                      </item>
+                                     </layout>
+                                    </widget>
+                                   </item>
+                                  </layout>
                                  </widget>
                                 </widget>
                                </item>

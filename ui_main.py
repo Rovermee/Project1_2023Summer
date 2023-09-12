@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'mainMQOOTH.ui'
+## Form generated from reading UI file 'mainAwJSSC.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.5.2
 ##
@@ -48,7 +48,6 @@ class ImageLabel(QLabel):
             self.PointRecorded = (x,y)
             self.clicked.emit(x,y)
             print(self.PointRecorded)
-
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -1409,7 +1408,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 218, 218))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 218, 258))
         self.scrollAreaWidgetContents.setStyleSheet(u" QScrollBar:vertical {\n"
 "	border: none;\n"
 "    background: rgb(52, 59, 72);\n"
@@ -1534,8 +1533,7 @@ class Ui_MainWindow(object):
         self.pushButton_fileOpen.setCursor(QCursor(Qt.PointingHandCursor))
         self.pushButton_fileOpen.setStyleSheet(u"background-color: rgb(52, 59, 72);")
         self.pushButton_fileOpen.setIcon(icon4)
-        self.label_pic_raw.setAlignment(Qt.AlignCenter)
-        self.lable_pic_pro.setAlignment(Qt.AlignCenter)
+
         self.horizontalLayout_8.addWidget(self.pushButton_fileOpen)
 
         self.label_2 = QLabel(self.groupBox_2)
@@ -2037,7 +2035,8 @@ class Ui_MainWindow(object):
         self.horizontalSlider_4.setOrientation(Qt.Horizontal)
 
         self.verticalLayout_30.addWidget(self.horizontalSlider_4)
-
+        self.label_pic_raw.setAlignment(Qt.AlignCenter)
+        self.lable_pic_pro.setAlignment(Qt.AlignCenter)
 
         self.horizontalLayout_16.addLayout(self.verticalLayout_30)
 
@@ -2125,16 +2124,9 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_28.addWidget(self.pushButton_3)
 
-        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_28.addItem(self.horizontalSpacer_7)
-
-        self.pushButton_4 = QPushButton(self.groupBox_6)
-        self.pushButton_4.setObjectName(u"pushButton_4")
-        self.pushButton_4.setStyleSheet(u"background-color: rgb(255, 170, 127);")
-
-        self.horizontalLayout_28.addWidget(self.pushButton_4)
-
+        self.horizontalLayout_28.setStretch(0, 4)
+        self.horizontalLayout_28.setStretch(1, 1)
+        self.horizontalLayout_28.setStretch(2, 4)
 
         self.verticalLayout_37.addLayout(self.horizontalLayout_28)
 
@@ -2161,6 +2153,123 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.tab_2, "")
         self.tab_5 = QWidget()
         self.tab_5.setObjectName(u"tab_5")
+        self.horizontalLayout_37 = QHBoxLayout(self.tab_5)
+        self.horizontalLayout_37.setObjectName(u"horizontalLayout_37")
+        self.groupBox_7 = QGroupBox(self.tab_5)
+        self.groupBox_7.setObjectName(u"groupBox_7")
+        self.verticalLayout_39 = QVBoxLayout(self.groupBox_7)
+        self.verticalLayout_39.setObjectName(u"verticalLayout_39")
+        self.horizontalLayout_31 = QHBoxLayout()
+        self.horizontalLayout_31.setObjectName(u"horizontalLayout_31")
+        self.label = QLabel(self.groupBox_7)
+        self.label.setObjectName(u"label")
+        self.label.setStyleSheet(u"color: rgb(0, 0, 0);\n"
+"font: 12pt \"\u9ed1\u4f53\";")
+
+        self.horizontalLayout_31.addWidget(self.label)
+
+        self.lineEdit_Text = QLineEdit(self.groupBox_7)
+        self.lineEdit_Text.setObjectName(u"lineEdit_Text")
+        self.lineEdit_Text.setStyleSheet(u"color: rgb(0, 85, 255);")
+
+        self.horizontalLayout_31.addWidget(self.lineEdit_Text)
+
+
+        self.verticalLayout_39.addLayout(self.horizontalLayout_31)
+
+        self.horizontalLayout_33 = QHBoxLayout()
+        self.horizontalLayout_33.setObjectName(u"horizontalLayout_33")
+        self.label_4 = QLabel(self.groupBox_7)
+        self.label_4.setObjectName(u"label_4")
+        self.label_4.setStyleSheet(u"color: rgb(0, 0, 0);\n"
+"font: 12pt \"\u9ed1\u4f53\";")
+
+        self.horizontalLayout_33.addWidget(self.label_4)
+
+        self.horizontalSlider_TextSize = QSlider(self.groupBox_7)
+        self.horizontalSlider_TextSize.setObjectName(u"horizontalSlider_TextSize")
+        self.horizontalSlider_TextSize.setOrientation(Qt.Horizontal)
+
+        self.horizontalLayout_33.addWidget(self.horizontalSlider_TextSize)
+
+
+        self.verticalLayout_39.addLayout(self.horizontalLayout_33)
+
+        self.horizontalLayout_36 = QHBoxLayout()
+        self.horizontalLayout_36.setObjectName(u"horizontalLayout_36")
+        self.label_11 = QLabel(self.groupBox_7)
+        self.label_11.setObjectName(u"label_11")
+        self.label_11.setStyleSheet(u"color: rgb(0, 0, 0);\n"
+"font: 12pt \"\u9ed1\u4f53\";")
+
+        self.horizontalLayout_36.addWidget(self.label_11)
+
+        self.horizontalSlider_TextSize_2 = QSlider(self.groupBox_7)
+        self.horizontalSlider_TextSize_2.setObjectName(u"horizontalSlider_TextSize_2")
+        self.horizontalSlider_TextSize_2.setOrientation(Qt.Horizontal)
+
+        self.horizontalLayout_36.addWidget(self.horizontalSlider_TextSize_2)
+
+
+        self.verticalLayout_39.addLayout(self.horizontalLayout_36)
+
+        self.horizontalLayout_34 = QHBoxLayout()
+        self.horizontalLayout_34.setObjectName(u"horizontalLayout_34")
+        self.label_5 = QLabel(self.groupBox_7)
+        self.label_5.setObjectName(u"label_5")
+        self.label_5.setStyleSheet(u"color: rgb(0, 0, 0);\n"
+"font: 12pt \"\u9ed1\u4f53\";")
+
+        self.horizontalLayout_34.addWidget(self.label_5)
+
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_34.addItem(self.horizontalSpacer_4)
+
+        self.pushButton_colorbutton = QPushButton(self.groupBox_7)
+        self.pushButton_colorbutton.setObjectName(u"pushButton_colorbutton")
+        self.pushButton_colorbutton.setStyleSheet(u"background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(9, 41, 4, 255), stop:0.085 rgba(2, 79, 0, 255), stop:0.19 rgba(50, 147, 22, 255), stop:0.275 rgba(236, 191, 49, 255), stop:0.39 rgba(243, 61, 34, 255), stop:0.555 rgba(135, 81, 60, 255), stop:0.667 rgba(121, 75, 255, 255), stop:0.825 rgba(164, 255, 244, 255), stop:0.885 rgba(104, 222, 71, 255), stop:1 rgba(93, 128, 0, 255));")
+
+        self.horizontalLayout_34.addWidget(self.pushButton_colorbutton)
+
+        self.horizontalLayout_34.setStretch(0, 4)
+        self.horizontalLayout_34.setStretch(1, 1)
+        self.horizontalLayout_34.setStretch(2, 4)
+
+        self.verticalLayout_39.addLayout(self.horizontalLayout_34)
+
+        self.horizontalLayout_35 = QHBoxLayout()
+        self.horizontalLayout_35.setObjectName(u"horizontalLayout_35")
+        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_35.addItem(self.horizontalSpacer_5)
+
+        self.pushButton_4 = QPushButton(self.groupBox_7)
+        self.pushButton_4.setObjectName(u"pushButton_4")
+        self.pushButton_4.setStyleSheet(u"background-color: rgb(52, 59, 72);")
+
+        self.horizontalLayout_35.addWidget(self.pushButton_4)
+
+        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_35.addItem(self.horizontalSpacer_7)
+
+        self.pushButton_5 = QPushButton(self.groupBox_7)
+        self.pushButton_5.setObjectName(u"pushButton_5")
+        self.pushButton_5.setStyleSheet(u"background-color: rgb(52, 59, 72);")
+
+        self.horizontalLayout_35.addWidget(self.pushButton_5)
+
+        self.horizontalSpacer_8 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_35.addItem(self.horizontalSpacer_8)
+
+
+        self.verticalLayout_39.addLayout(self.horizontalLayout_35)
+
+
+        self.horizontalLayout_37.addWidget(self.groupBox_7)
+
         self.tabWidget.addTab(self.tab_5, "")
 
         self.verticalLayout_24.addWidget(self.tabWidget)
@@ -2319,9 +2428,9 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(3)
+        self.stackedWidget.setCurrentIndex(0)
         self.tabWidget_2.setCurrentIndex(1)
-        self.tabWidget.setCurrentIndex(3)
+        self.tabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -2507,9 +2616,17 @@ class Ui_MainWindow(object):
         self.groupBox_6.setTitle(QCoreApplication.translate("MainWindow", u"\u533a\u57df\u7279\u6548", None))
         self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"\u9a6c\u8d5b\u514b", None))
         self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"\u56fe\u50cf\u5206\u5272", None))
-        self.pushButton_4.setText(QCoreApplication.translate("MainWindow", u"\u53bb\u9664\u7269\u4f53", None))
         self.pushButton_fileSave_3.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58\u900f\u660e\u56fe\u50cf", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("MainWindow", u"\u7279\u6548", None))
+        self.groupBox_7.setTitle("")
+        self.label.setText(QCoreApplication.translate("MainWindow", u"\u5185\u5bb9\uff1a", None))
+        self.lineEdit_Text.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\u8bf7\u8f93\u5165\u8981\u63d2\u5165\u7684\u6587\u5b57\uff1a", None))
+        self.label_4.setText(QCoreApplication.translate("MainWindow", u"\u5b57\u4f53\u5927\u5c0f\uff1a", None))
+        self.label_11.setText(QCoreApplication.translate("MainWindow", u"\u5b57\u4f53\u7c97\u7ec6\uff1a", None))
+        self.label_5.setText(QCoreApplication.translate("MainWindow", u"\u989c\u8272\uff1a", None))
+        self.pushButton_colorbutton.setText(QCoreApplication.translate("MainWindow", u"\u989c\u8272", None))
+        self.pushButton_4.setText(QCoreApplication.translate("MainWindow", u"\u5f00\u59cb\u63d2\u5165", None))
+        self.pushButton_5.setText(QCoreApplication.translate("MainWindow", u"\u63d2\u5165\u7ed3\u675f", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), QCoreApplication.translate("MainWindow", u"\u6587\u5b57", None))
         self.btn_message.setText(QCoreApplication.translate("MainWindow", u"Message", None))
         self.btn_print.setText(QCoreApplication.translate("MainWindow", u"Print", None))
