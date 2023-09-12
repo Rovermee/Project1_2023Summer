@@ -18,6 +18,7 @@ import  time
 import sys
 import os
 import platform
+import  math
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////
 import cv2
@@ -44,6 +45,11 @@ os.environ["QT_FONT_DPI"] = "96" # FIX Problem for High DPI and Scale above 100%
 widgets = None
 MUSIC_PLAY = True
 
+
+
+
+
+
 class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -59,12 +65,30 @@ class MainWindow(QMainWindow):
         self.image = None               #图片信息
         self.image_state = "color"      #图片读入状态，默认为彩色图片
         self.image_path = None          #图片本地地址
-        self.image_processed = None     #处理后的图片
-        self.image_Sized = None         #裁剪完的图片
+        self.image_processed = None     #渲染处理后的图片
         self.image_forStyle = None      #滤镜处理完的图片
+        self.image_Sized = None         #裁剪完的图片
+
         self.image_Printed = None       #涂鸦完成的图片
+        self.image_style = "Normal"     #图片的风格
+        self.ChangeSize = False
+        self.Changerotation = False
+        self.Points = []
+        self.TransformFlag = False
+        self.TransformPointNum = None
+        self.TransformStart = False
+        self.SpecialEffect = False
+        self.SpecialEffectArea = None
+        self.img_transpancy = None
+
+        self.drawing = False  # 是否开始绘制
+        self.tpPointsChoose = []  # 用于存储多边形的顶点
+        self.drawing = False  # 是否在绘制多边形
+        self.tempFlag = False  # 是否按下右键
 
 
+
+        widgets.lable_pic_pro.clicked.connect(self.handle_click)
         # USE CUSTOM TITLE BAR | USE AS "False" FOR MAC OR LINUX
         # ///////////////////////////////////////////////////////////////
         Settings.ENABLE_CUSTOM_TITLE_BAR = True
@@ -110,15 +134,21 @@ class MainWindow(QMainWindow):
         widgets.radioButton_gray.clicked.connect(self.getRadioButtonState)
         widgets.pushButton_fileOpen.clicked.connect(self.imageReader)
         widgets.pushButton_fileSave.clicked.connect(self.imageSaver)
-
-
-
+        widgets.pushButton_fileSave_2.clicked.connect(self.imageSaver)
+        widgets.pushButton_Resize.clicked.connect(self.ChangeImageSize)
+        widgets.radioButton_Fangshe.clicked.connect(self.Transform)
+        widgets.radioButton_Toushi.clicked.connect(self.Transform)
+        widgets.radioButton_AoTou.clicked.connect(self.SpecialEffectStart)
+        widgets.radioButton_TuTou.clicked.connect(self.SpecialEffectStart)
+        widgets.radioButton_CaoTu.clicked.connect(self.SpecialEffectStart)
+        widgets.radioButton_NONE.clicked.connect(self.SpecialEffectStart)
+        widgets.pushButton_2.clicked.connect(self.AreaSpecialEffectStart)
+        widgets.pushButton_3.clicked.connect(self.AreaSpecialEffectStart)
+        widgets.pushButton_4.clicked.connect(self.AreaSpecialEffectStart)
 
         """图像显示与处理区"""
         widgets.horizontalSlider_rendering_2.valueChanged.connect(self.ImageRendering)
         widgets.horizontalSlider_rendering_2.setValue(50)
-        widgets.horizontalSlider_rendering_3.valueChanged.connect(self.ImageRendering)
-        widgets.horizontalSlider_rendering_3.setValue(50)
         widgets.horizontalSlider_rendering_4.valueChanged.connect(self.ImageRendering)
         widgets.horizontalSlider_rendering_4.setValue(50)
         widgets.horizontalSlider_rendering_5.valueChanged.connect(self.ImageRendering)
@@ -130,11 +160,49 @@ class MainWindow(QMainWindow):
         widgets.horizontalSlider_rendering_8.valueChanged.connect(self.ImageRendering)
         widgets.horizontalSlider_rendering_8.setValue(0)
         widgets.horizontalSlider_rendering_9.valueChanged.connect(self.ImageRendering)
-        widgets.horizontalSlider_rendering_9.setValue(50)
+        widgets.horizontalSlider_rendering_9.setValue(0)
         widgets.horizontalSlider_rendering_10.valueChanged.connect(self.ImageRendering)
         widgets.horizontalSlider_rendering_10.setValue(0)
         widgets.horizontalSlider_rendering_11.valueChanged.connect(self.ImageRendering)
         widgets.horizontalSlider_rendering_11.setValue(0)
+        widgets.horizontalSlider_Rotation.valueChanged.connect(self.ChangeImageRotation)
+        widgets.horizontalSlider_Rotation.setValue(360)
+        widgets.horizontalSlider_2.valueChanged.connect(self.ImageRendering)
+        widgets.horizontalSlider_3.valueChanged.connect(self.ImageRendering)
+        widgets.horizontalSlider_4.valueChanged.connect(self.ImageRendering)
+        widgets.horizontalSlider_2.setValue(50)
+        widgets.horizontalSlider_3.setValue(50)
+        widgets.horizontalSlider_4.setValue(50)
+        widgets.horizontalSlider_5.valueChanged.connect(self.ImageRendering)
+        widgets.horizontalSlider_6.valueChanged.connect(self.ImageRendering)
+        widgets.horizontalSlider_7.valueChanged.connect(self.ImageRendering)
+        widgets.horizontalSlider_5.setValue(50)
+        widgets.horizontalSlider_6.setValue(50)
+        widgets.horizontalSlider_7.setValue(50)
+        """风格区"""
+        widgets.Button_Style_1.clicked.connect(self.ChangeImageStyle)
+        widgets.Button_Style_2.clicked.connect(self.ChangeImageStyle)
+        widgets.Button_Style_3.clicked.connect(self.ChangeImageStyle)
+        widgets.Button_Style_4.clicked.connect(self.ChangeImageStyle)
+        widgets.Button_Style_5.clicked.connect(self.ChangeImageStyle)
+        widgets.Button_Style_6.clicked.connect(self.ChangeImageStyle)
+        widgets.Button_Style_7.clicked.connect(self.ChangeImageStyle)
+        widgets.Button_Style_8.clicked.connect(self.ChangeImageStyle)
+        widgets.Button_Style_9.clicked.connect(self.ChangeImageStyle)
+        widgets.Button_Style_10.clicked.connect(self.ChangeImageStyle)
+        widgets.Button_Style_11.clicked.connect(self.ChangeImageStyle)
+        widgets.Button_Style_12.clicked.connect(self.ChangeImageStyle)
+        widgets.Button_Style_13.clicked.connect(self.ChangeImageStyle)
+        widgets.Button_Style_14.clicked.connect(self.ChangeImageStyle)
+        widgets.Button_Style_15.clicked.connect(self.ChangeImageStyle)
+        widgets.Button_Style_15.setChecked(True)
+        widgets.radioButton_color.setChecked(True)
+
+
+
+
+
+
         #widgets.label_pic_raw.setScaledContents(True)
         # EXTRA RIGHT BOX
         def openCloseRightBox():
@@ -167,6 +235,46 @@ class MainWindow(QMainWindow):
         # ///////////////////////////////////////////////////////////////
         widgets.stackedWidget.setCurrentWidget(widgets.home)
         widgets.btn_home.setStyleSheet(UIFunctions.selectMenu(widgets.btn_home.styleSheet()))
+
+    def handle_click(self,x,y):
+        if self.TransformFlag == True:
+            self.Points.append((x,y))
+            if len(self.Points)==self.TransformPointNum:
+                self.TransformStart = True
+                self.ImageRendering()
+
+    def filter_convex_lens(self,img,center_x, center_y, scale, fixed_radius):
+        row, col, channel = img.shape
+        y_indices, x_indices = np.indices((row, col))
+        distance = (x_indices - center_x)**2 + (y_indices - center_y)**2
+        valid_indices = distance <= fixed_radius**2
+        new_dist = np.sqrt(distance[valid_indices]) * scale
+        new_x = ((new_dist * (x_indices[valid_indices] - center_x) / fixed_radius + center_x))
+        new_y = ((new_dist * (y_indices[valid_indices] - center_y) / fixed_radius + center_y))
+        new_x = np.clip(new_x, 0, col - 1).astype(int)
+        new_y = np.clip(new_y, 0, row - 1).astype(int)
+        new_img = np.zeros_like(img)
+        new_img[y_indices[valid_indices], x_indices[valid_indices]] = img[new_y, new_x]
+        new_img[~valid_indices] = img[~valid_indices]
+        return new_img
+
+    def filter_concave_lens(self, src_img, cx, cy, sc):
+        height, width = src_img.shape[:2]
+        center = (cx, cy)
+        img2 = np.zeros(src_img.shape, dtype=np.uint8)
+        y, x = np.indices((height, width))
+        theta = np.arctan2(y - center[1], x - center[0])
+        R2 = np.sqrt(np.linalg.norm(np.dstack([x, y]) - center, axis=2)) * sc
+        newX = center[0] + R2 * np.cos(theta)
+        newY = center[1] + R2 * np.sin(theta)
+
+        newX[newX < 0] = 0
+        newX[newX >= width] = width - 1
+        newY[newY < 0] = 0
+        newY[newY >= height] = height - 1
+
+        img2[y, x] = src_img[newY.astype(int), newX.astype(int)]
+        return img2
 
     def buttonClick(self):
         # GET BUTTON CLICKED
@@ -349,23 +457,13 @@ class MainWindow(QMainWindow):
         thresh = cv2.adaptiveThreshold(gray_image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
         dst = shadow_effect = cv2.addWeighted(img, 1 - factor / 100, cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR), factor / 100,0)
         return dst
-    #颗粒
-    def Grainy(self, img, level):
-        level /= 2
-        if level > 50:
-            level = 50
-        if level < 0:
-            level = 0
 
-        noise = np.random.randint(-level, level + 1, img.shape, dtype=np.int32)
-        result = np.clip(img + noise, 0, 255).astype(np.uint8)  # 添加随机噪声
-        return result
     #纹理
     def texture_flatten(self, img, smoothing_level):
         if smoothing_level<=25:
             blurred_image = cv2.GaussianBlur(img, (5, 5), 0)  # 调整卷积核大小和标准差以控制模糊程度
         elif smoothing_level<=50:
-            blurred_image = cv2.medianBlur(image, 5)  # 调整窗口大小以控制模糊程度
+            blurred_image = cv2.medianBlur(img, 5)  # 调整窗口大小以控制模糊程度
         elif smoothing_level<=75:
             kernel = np.array([[-1, -1, -1],
                            [-1, 9, -1],
@@ -374,6 +472,7 @@ class MainWindow(QMainWindow):
         else:
             blurred_image = cv2.Canny(img, 30, 70)  # 调整阈值以控制边缘检测的强度
         return blurred_image
+
     # 颗粒
     def Grainy(self, src, level):
         level /= 2
@@ -384,10 +483,11 @@ class MainWindow(QMainWindow):
 
         noise = np.random.randint(-level, level + 1, src.shape, dtype=np.int32)
         result = np.clip(src + noise, 0, 255).astype(np.uint8)# 添加随机噪声
-
         return result
+
     def imageReader(self):
         self.ui.lable_pic_pro.clear()
+        self.image_style = "Normal"
         options = QFileDialog.Options()
         file_path, _ = QFileDialog.getOpenFileName(self, 'Open Image', '',
                                                            'Image Files (*.png *.jpg *.bmp);;All Files (*)',
@@ -407,17 +507,28 @@ class MainWindow(QMainWindow):
             QMessageBox.warning("错误","读取图片失败!!!")
 
     def imageSaver(self):
-        if self.image_processed is not None:
-            save_path, _ = QFileDialog.getSaveFileName(self, 'Save Image', '',
-                                                       'Image Files (*.png *.jpg *.bmp);;All Files (*)')
-            if save_path:
-                cv2.imwrite(save_path, self.image_processed)
-        else:
-            QMessageBox.warning(self,"错误","图片未进行修改！！！")
+        btn = self.sender()
+        btnName = btn.objectName()
+        if btnName == "pushButton_fileSave":
+            if self.image_processed is not None:
+                save_path, _ = QFileDialog.getSaveFileName(self, 'Save Image', '',
+                                                           'Image Files (*.png *.jpg *.bmp);;All Files (*)')
+                if save_path:
+                    cv2.imwrite(save_path, self.image_processed)
+            else:
+                QMessageBox.warning(self,"错误","图片未进行修改！！！")
+        elif btnName == "pushButton_fileSave_2":
+            if self.img_transpancy is not None:
+
+                save_path, _ = QFileDialog.getSaveFileName(self, 'Save Image', '',
+                                                           'Image Files (*.png *.jpg *.bmp);;All Files (*)')
+                if save_path:
+                    cv2.imwrite(save_path,self.img_transpancy)
+                else:
+                    QMessageBox.warning(self, "错误", "图片未进行修改！！！")
 
     def updateImageSize(self,img_path):
         if self.image is not None:
-            """pixmap = QPixmap(img_path)"""
             height, width, channel = self.image.shape
             bytes_per_line = 3 * width
             qt_image = QImage(self.image.data, width, height, bytes_per_line,
@@ -435,6 +546,87 @@ class MainWindow(QMainWindow):
             pixmap = QPixmap.fromImage(qt_image)
             self.ui.lable_pic_pro.setPixmap(
                 pixmap.scaled(self.ui.lable_pic_pro.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            self.ui.lable_pic_pro.setimage_size(self.image_processed)
+
+    def ChangeImageStyle(self):
+        btn = self.sender()
+        btnName = btn.objectName()
+        # SHOW HOME PAGE
+        if btnName == "Button_Style_1":
+            self.image_style = "AUTUMN"
+        elif btnName == "Button_Style_2":
+            self.image_style = "BONE"
+        elif btnName == "Button_Style_3":
+            self.image_style = "JET"
+        elif btnName == "Button_Style_4":
+            self.image_style = "HSV"
+        elif btnName == "Button_Style_5":
+            self.image_style = "SPRING"
+        elif btnName == "Button_Style_6":
+            self.image_style = "SUMMER"
+        elif btnName == "Button_Style_7":
+            self.image_style = "WINTER"
+        elif btnName == "Button_Style_8":
+            self.image_style = "OCEAN"
+        elif btnName == "Button_Style_9":
+            self.image_style = "HOT"
+        elif btnName == "Button_Style_10":
+            self.image_style = "COOL"
+        elif btnName == "Button_Style_11":
+            self.image_style = "RAINBOW"
+        elif btnName == "Button_Style_12":
+            self.image_style = "PINK"
+        elif btnName == "Button_Style_13":
+            self.image_style = "SKETCH"
+        elif btnName == "Button_Style_14":
+            self.image_style = "CARTOON"
+        elif btnName == "Button_Style_15":
+            self.image_style = "Normal"
+        self.ImageRendering()
+
+    def ChangeImageSize(self):
+        self.ChangeSize = True
+        self.ImageRendering()
+
+    def ChangeImageRotation(self):
+        self.Changerotation = True
+        self.ImageRendering()
+
+    def Transform(self):
+        # GET BUTTON CLICKED
+        btn = self.sender()
+        btnName = btn.objectName()
+        self.TransformFlag = True
+        if btnName == "radioButton_Fangshe":
+            self.Points = []
+            self.TransformPointNum = 3
+        if btnName == "radioButton_Toushi":
+            self.Points = []
+            self.TransformPointNum = 4
+
+    def SpecialEffectStart(self):
+        self.SpecialEffect = True
+        self.ImageRendering()
+
+    def AreaSpecialEffectStart(self):
+        btn = self.sender()
+        btnName = btn.objectName()
+        if btnName =="pushButton_2":
+            self.SpecialEffectArea = 2
+        elif btnName == "pushButton_3":
+            self.SpecialEffectArea = 3
+        elif btnName == "pushButton_4":
+            self.SpecialEffectArea = 4
+        self.ImageRendering()
+
+    def draw_ROI(self, event, x, y, flags, param):
+        if event == cv2.EVENT_LBUTTONDOWN:
+            self.tpPointsChoose.append((x, y))  # 保存顶点
+            self.drawing = True
+        elif event == cv2.EVENT_RBUTTONDOWN:
+            self.drawing = True
+            self.tempFlag = True  # 按下右键，表示多边形绘制完成
+
 
     def ImageRendering(self):
 
@@ -448,8 +640,6 @@ class MainWindow(QMainWindow):
                 temperature = self.ui.horizontalSlider_rendering_7.value()
                 color_tone = self.ui.horizontalSlider_rendering_6.value()
                 img = self.adjust_image(img,brightness,contrast,saturation,temperature,color_tone)
-
-
             if self.ui.horizontalSlider_rendering_8.value() != 0:
                 USM = widgets.horizontalSlider_rendering_8.value()
                 img = self.ImproveUSM(img,USM)
@@ -462,9 +652,179 @@ class MainWindow(QMainWindow):
             if self.ui.horizontalSlider_rendering_11.value() != 0:
                 level = widgets.horizontalSlider_rendering_11.value()
                 img = self.ShadowImg(img,level)
+            if self.image_style!="Normal":
+                if self.image_style == "CARTOON":
+                    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                    img_gray = cv2.medianBlur(img_gray, 7)
+                    edges = cv2.Laplacian(img_gray, cv2.CV_8U, ksize=5)
+                    ret, mask = cv2.threshold(edges, 100, 255, cv2.THRESH_BINARY_INV)
+                    img_small = cv2.resize(img, None, fx=1, fy=1.0 ,
+                                           interpolation=cv2.INTER_AREA)
+                    num_repetitions = 10
+                    sigma_color = 5
+                    sigma_space = 7
+                    size = 5
+                    for i in range(num_repetitions):
+                        img_small = cv2.bilateralFilter(img_small, size, sigma_color, sigma_space)
+                    img_output = cv2.resize(img_small, None, fx=1, fy=1, interpolation=cv2.INTER_LINEAR)
+                    dst = np.zeros(img_gray.shape)
+                    img = cv2.bitwise_and(img_output, img_output, mask=mask)
+                elif self.image_style == "SKETCH":
+                    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                    img_gray = cv2.medianBlur(img_gray, 7)
+                    edges = cv2.Laplacian(img_gray, cv2.CV_8U, ksize=5)
+                    ret, mask = cv2.threshold(edges, 100, 255, cv2.THRESH_BINARY_INV)
+                    img = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
+                else:
+                    # 根据颜色映射名称获取OpenCV中对应的常量值
+                    lut = getattr(cv2, 'COLORMAP_' + self.image_style)
+                    # 应用颜色映射到图片
+                    result = cv2.applyColorMap(img, lut)
+                    # 在图片上添加颜色映射名称文本
+                    #result = cv2.putText(result, self.image_style, (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+                    img = result
+
+            if self.ChangeSize == True:
+                    width = int(self.ui.lineEdit_Width.text())
+                    height = int(self.ui.lineEdit_Height.text())
+                    scale_percent = 10
+                    dim = (width, height)
+                    resized_image = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+                    img = resized_image
+            if self.Changerotation == True:
+                # 获取滚动条的值
+                angle = self.ui.horizontalSlider_Rotation.value()
+                # 旋转
+                rows, cols = img.shape[:2]
+                M = cv2.getRotationMatrix2D((cols / 2, rows / 2), angle, 1)
+                dst = cv2.warpAffine(img, M, (cols, rows), borderValue=(255, 255, 255))
+                img = dst
+                self.Changerotation = False
+            if self.TransformStart == True:
+                self.TransformFlag = False
+                self.TransformPointNum = None
+                self.TransformStart = False
+                if self.ui.radioButton_Fangshe.isChecked():
+                    rows, cols = img.shape[:2]
+                    mask = np.zeros((rows, cols), dtype=np.uint8)
+                    pts1 = np.float32(self.Points)
+                    pts2 = np.float32([[0, 0], [cols, 0], [cols, rows]])
+                    M = cv2.getAffineTransform(pts1, pts2)
+                    cv2.fillPoly(mask, [np.array(self.Points)], (255, 255, 255))
+                    dst = cv2.warpAffine(img, M, (cols, rows))
+                    dst_trans = cv2.cvtColor(dst, cv2.COLOR_BGR2BGRA)
+                    dst_trans[:, :, 3] = mask
+                    self.img_transpancy = dst_trans
+                    img = dst
+                    self.ui.radioButton_Fangshe.setChecked(False)
+                elif self.ui.radioButton_Toushi.isChecked():
+                    img_2 = img.copy()
+                    height, width, channel = img.shape
+                    mask = np.zeros((height, width))
+                    M = cv2.getPerspectiveTransform(
+                        np.float32([[0, 0], [0, width - 1], [height - 1, width - 1], [height - 1, 0]]),
+                        np.float32(self.Points))
+                    cv2.fillPoly(mask, [np.array(self.Points)], color=255)
+                    dst = cv2.warpPerspective(img_2, M, (width, height))
+                    dst_trans = cv2.cvtColor(dst, cv2.COLOR_BGR2BGRA)
+                    dst_trans[:, :, 3] = mask
+                    self.img_transpancy = dst_trans
+                    img = dst
+                    self.ui.radioButton_Toushi.setChecked(False)
+                self.Points = []
+
+            if self.SpecialEffect == True:
+                if self.ui.radioButton_AoTou.isChecked():
+                    """凹透镜"""
+                    cy = img.shape[0] // 2
+                    cx = img.shape[1] // 2
+                    sc = 1.0
+
+                    cx = self.ui.horizontalSlider_2.value()/200*img.shape[1]
+                    cy = self.ui.horizontalSlider_3.value()/200*img.shape[0]
+                    sc = self.ui.horizontalSlider_4.value()/5+10
+                    filtered_img = self.filter_concave_lens(img, cx, cy, sc)
+                    scale_percent = 50
+
+                    width = int(img.shape[1] * scale_percent / 100)
+                    height = int(img.shape[0] * scale_percent / 100)
+                    dim = (width, height)
+                    # resized_input = cv2.resize(self.image, dim, interpolation=cv2.INTER_AREA)
+                    resized_input = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+                    resized_filtered = cv2.resize(filtered_img, dim, interpolation=cv2.INTER_AREA)
+                    img = resized_filtered
+
+                elif self.ui.radioButton_TuTou.isChecked():
+                    """凸透镜"""
+                    cy = img.shape[0] // 2
+                    cx = img.shape[1] // 2
+                    sc = 1.0
+                    fixed_radius = max(cx, cy) * 2
+
+                    cx = self.ui.horizontalSlider_5.value()*5
+                    cy = self.ui.horizontalSlider_6.value()*5
+                    scale = self.ui.horizontalSlider_7.value() / 50
+                    filtered_img = self.filter_convex_lens(img, cx, cy, scale, fixed_radius)
+
+                    scale_percent = 50
+                    width = int(img.shape[1] * scale_percent / 100)
+                    height = int(img.shape[0] * scale_percent / 100)
+                    dim = (width, height)
+                    # resized_input = cv2.resize(self.image, dim, interpolation=cv2.INTER_AREA)
+                    resized_filtered = cv2.resize(filtered_img, dim, interpolation=cv2.INTER_AREA)
+
+                    img = resized_filtered
+
+                elif self.ui.radioButton_CaoTu.isChecked():
+                    dst = cv2.Sobel(img, -1, 1, 1)
+                    dst = 255 - dst
+                    img = dst
+
+                elif self.ui.radioButton_NONE.isChecked():
+                    self.SpecialEffect = False
+
+            if self.SpecialEffectArea is not None:
+                if self.SpecialEffectArea == 2:
+                    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                    imgg = img.copy()
+                    r, c = img.shape
+                    cv2.namedWindow('image')
+                    cv2.setMouseCallback('image', self.draw_ROI)
+                    mask = np.zeros((r, c), dtype=np.uint8)
+                    while True:
+                        if self.tempFlag and self.drawing:
+                            if len(self.tpPointsChoose) >= 3:
+                                cv2.fillPoly(mask, [np.array(self.tpPointsChoose)], 255)
+                                cv2.polylines(img, [np.array(self.tpPointsChoose)], isClosed=True, color=(0, 255, 0),
+                                              thickness=1)
+                        else:
+                            if len(self.tpPointsChoose) > 0:
+                                cv2.polylines(img, [np.array(self.tpPointsChoose)], isClosed=False, color=(0, 255, 0),
+                                              thickness=1)
+                        cv2.imshow('image', imgg)
+                        if cv2.waitKey(1) & 0xFF == 13:  # 按enter键保存图像
+                            self.tempFlag = False
+                            break
+
+                    cv2.destroyAllWindows()
+
+                    key = np.random.randint(0, 256, size=[r, c], dtype=np.uint8)
+                    imgXorKey = cv2.bitwise_xor(img, key)  # 异或运算，加密
+                    encryptFace = cv2.bitwise_and(imgXorKey, mask)  # 与运算，提取前景
+                    noFace1 = cv2.bitwise_and(img, 255 - mask)  # 与运算，提取背景
+                    masked_img = cv2.add(encryptFace, noFace1)  # 加运算，合成图像
+                    img = masked_img
+                    img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+                    cv2.destroyAllWindows()
+
+                elif self.SpecialEffectArea == 3:
+                    pass
+                elif self.SpecialEffectArea == 4:
+                    pass
 
             self.image_processed = img
             self.updateImageProcessed()
+
 
 
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'mainipttLh.ui'
+## Form generated from reading UI file 'mainMQOOTH.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.5.2
 ##
@@ -11,7 +11,7 @@
 from PySide6.QtCharts import QChartView
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
+    QSize, QTime, QUrl, Qt, Signal)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
@@ -26,6 +26,29 @@ from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplicat
     QWidget)
 import resources_rc
 import  resources
+
+class ImageLabel(QLabel):
+    clicked = Signal(int,int)  # 自定义信号，将 QPoint 作为参数
+    def __init__(self,frame):
+        super().__init__(frame)
+        self.setMouseTracking(True)  # 启用鼠标跟踪
+        self.PointRecorded = None
+
+    def setimage_size(self,img):
+        self.image = img
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            label_size = self.size()
+            pixmap_size = self.pixmap().size()
+            dx = event.x() - (label_size.width()-pixmap_size.width())/2
+            dy = event.y() - (label_size.height()-pixmap_size.height())/2
+            x = dx * self.image.shape[1]/pixmap_size.width()
+            y = dy * self.image.shape[0]/pixmap_size.height()
+            self.PointRecorded = (x,y)
+            self.clicked.emit(x,y)
+            print(self.PointRecorded)
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -1480,8 +1503,9 @@ class Ui_MainWindow(object):
         self.tab_4.setObjectName(u"tab_4")
         self.horizontalLayout_29 = QHBoxLayout(self.tab_4)
         self.horizontalLayout_29.setObjectName(u"horizontalLayout_29")
-        self.lable_pic_pro = QLabel(self.tab_4)
+        self.lable_pic_pro = ImageLabel(self.tab_4)
         self.lable_pic_pro.setObjectName(u"lable_pic_pro")
+        self.lable_pic_pro.setMouseTracking(True)
         self.lable_pic_pro.setStyleSheet(u"background-color: rgb(255, 255, 255);")
 
         self.horizontalLayout_29.addWidget(self.lable_pic_pro)
@@ -1510,7 +1534,8 @@ class Ui_MainWindow(object):
         self.pushButton_fileOpen.setCursor(QCursor(Qt.PointingHandCursor))
         self.pushButton_fileOpen.setStyleSheet(u"background-color: rgb(52, 59, 72);")
         self.pushButton_fileOpen.setIcon(icon4)
-
+        self.label_pic_raw.setAlignment(Qt.AlignCenter)
+        self.lable_pic_pro.setAlignment(Qt.AlignCenter)
         self.horizontalLayout_8.addWidget(self.pushButton_fileOpen)
 
         self.label_2 = QLabel(self.groupBox_2)
@@ -1592,25 +1617,6 @@ class Ui_MainWindow(object):
 
 
         self.verticalLayout_26.addLayout(self.horizontalLayout_15)
-
-        self.horizontalLayout_16 = QHBoxLayout()
-        self.horizontalLayout_16.setObjectName(u"horizontalLayout_16")
-        self.label_11 = QLabel(self.tab_rendering)
-        self.label_11.setObjectName(u"label_11")
-        self.label_11.setStyleSheet(u"color: rgb(0, 0, 0);\n"
-"font: 12pt \"\u9ed1\u4f53\";")
-
-        self.horizontalLayout_16.addWidget(self.label_11)
-
-        self.horizontalSlider_rendering_3 = QSlider(self.tab_rendering)
-        self.horizontalSlider_rendering_3.setObjectName(u"horizontalSlider_rendering_3")
-        self.horizontalSlider_rendering_3.setStyleSheet(u"")
-        self.horizontalSlider_rendering_3.setOrientation(Qt.Horizontal)
-
-        self.horizontalLayout_16.addWidget(self.horizontalSlider_rendering_3)
-
-
-        self.verticalLayout_26.addLayout(self.horizontalLayout_16)
 
         self.horizontalLayout_17 = QHBoxLayout()
         self.horizontalLayout_17.setObjectName(u"horizontalLayout_17")
@@ -1769,191 +1775,397 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.tab_rendering, "")
         self.tab_fun2 = QWidget()
         self.tab_fun2.setObjectName(u"tab_fun2")
-        self.layoutWidget = QWidget(self.tab_fun2)
-        self.layoutWidget.setObjectName(u"layoutWidget")
-        self.layoutWidget.setGeometry(QRect(10, 320, 131, 20))
-        self.horizontalLayout_14 = QHBoxLayout(self.layoutWidget)
+        self.verticalLayout_35 = QVBoxLayout(self.tab_fun2)
+        self.verticalLayout_35.setObjectName(u"verticalLayout_35")
+        self.groupBox_5 = QGroupBox(self.tab_fun2)
+        self.groupBox_5.setObjectName(u"groupBox_5")
+        self.groupBox_5.setStyleSheet(u"color: rgb(0, 0, 0);\n"
+"font: 12pt \"\u9ed1\u4f53\";")
+        self.horizontalLayout_30 = QHBoxLayout(self.groupBox_5)
+        self.horizontalLayout_30.setObjectName(u"horizontalLayout_30")
+        self.verticalLayout_31 = QVBoxLayout()
+        self.verticalLayout_31.setObjectName(u"verticalLayout_31")
+        self.Button_Style_9 = QRadioButton(self.groupBox_5)
+        self.Button_Style_9.setObjectName(u"Button_Style_9")
+        self.Button_Style_9.setStyleSheet(u"color: rgb(170, 85, 255);")
+
+        self.verticalLayout_31.addWidget(self.Button_Style_9)
+
+        self.Button_Style_10 = QRadioButton(self.groupBox_5)
+        self.Button_Style_10.setObjectName(u"Button_Style_10")
+        self.Button_Style_10.setStyleSheet(u"color: rgb(170, 85, 255);")
+
+        self.verticalLayout_31.addWidget(self.Button_Style_10)
+
+        self.Button_Style_11 = QRadioButton(self.groupBox_5)
+        self.Button_Style_11.setObjectName(u"Button_Style_11")
+        self.Button_Style_11.setStyleSheet(u"color: rgb(170, 85, 255);")
+
+        self.verticalLayout_31.addWidget(self.Button_Style_11)
+
+        self.Button_Style_12 = QRadioButton(self.groupBox_5)
+        self.Button_Style_12.setObjectName(u"Button_Style_12")
+        self.Button_Style_12.setStyleSheet(u"color: rgb(170, 85, 255);")
+
+        self.verticalLayout_31.addWidget(self.Button_Style_12)
+
+        self.Button_Style_5 = QRadioButton(self.groupBox_5)
+        self.Button_Style_5.setObjectName(u"Button_Style_5")
+        self.Button_Style_5.setStyleSheet(u"color: rgb(170, 85, 255);")
+
+        self.verticalLayout_31.addWidget(self.Button_Style_5)
+
+        self.Button_Style_6 = QRadioButton(self.groupBox_5)
+        self.Button_Style_6.setObjectName(u"Button_Style_6")
+        self.Button_Style_6.setStyleSheet(u"color: rgb(170, 85, 255);")
+
+        self.verticalLayout_31.addWidget(self.Button_Style_6)
+
+        self.Button_Style_7 = QRadioButton(self.groupBox_5)
+        self.Button_Style_7.setObjectName(u"Button_Style_7")
+        self.Button_Style_7.setStyleSheet(u"color: rgb(170, 85, 255);")
+
+        self.verticalLayout_31.addWidget(self.Button_Style_7)
+
+        self.Button_Style_8 = QRadioButton(self.groupBox_5)
+        self.Button_Style_8.setObjectName(u"Button_Style_8")
+        self.Button_Style_8.setStyleSheet(u"color: rgb(170, 85, 255);")
+
+        self.verticalLayout_31.addWidget(self.Button_Style_8)
+
+        self.Button_Style_1 = QRadioButton(self.groupBox_5)
+        self.Button_Style_1.setObjectName(u"Button_Style_1")
+        self.Button_Style_1.setStyleSheet(u"color: rgb(170, 85, 255);")
+
+        self.verticalLayout_31.addWidget(self.Button_Style_1)
+
+        self.Button_Style_2 = QRadioButton(self.groupBox_5)
+        self.Button_Style_2.setObjectName(u"Button_Style_2")
+        self.Button_Style_2.setStyleSheet(u"color: rgb(170, 85, 255);")
+
+        self.verticalLayout_31.addWidget(self.Button_Style_2)
+
+        self.Button_Style_3 = QRadioButton(self.groupBox_5)
+        self.Button_Style_3.setObjectName(u"Button_Style_3")
+        self.Button_Style_3.setStyleSheet(u"color: rgb(170, 85, 255);")
+
+        self.verticalLayout_31.addWidget(self.Button_Style_3)
+
+        self.Button_Style_4 = QRadioButton(self.groupBox_5)
+        self.Button_Style_4.setObjectName(u"Button_Style_4")
+        self.Button_Style_4.setStyleSheet(u"color: rgb(170, 85, 255);")
+
+        self.verticalLayout_31.addWidget(self.Button_Style_4)
+
+
+        self.horizontalLayout_30.addLayout(self.verticalLayout_31)
+
+        self.verticalLayout_32 = QVBoxLayout()
+        self.verticalLayout_32.setObjectName(u"verticalLayout_32")
+        self.Button_Style_14 = QRadioButton(self.groupBox_5)
+        self.Button_Style_14.setObjectName(u"Button_Style_14")
+        self.Button_Style_14.setStyleSheet(u"color: rgb(170, 85, 255);")
+
+        self.verticalLayout_32.addWidget(self.Button_Style_14)
+
+        self.Button_Style_13 = QRadioButton(self.groupBox_5)
+        self.Button_Style_13.setObjectName(u"Button_Style_13")
+        self.Button_Style_13.setStyleSheet(u"color: rgb(170, 85, 255);")
+
+        self.verticalLayout_32.addWidget(self.Button_Style_13)
+
+        self.Button_Style_15 = QRadioButton(self.groupBox_5)
+        self.Button_Style_15.setObjectName(u"Button_Style_15")
+        self.Button_Style_15.setStyleSheet(u"color: rgb(170, 85, 255);")
+
+        self.verticalLayout_32.addWidget(self.Button_Style_15)
+
+
+        self.horizontalLayout_30.addLayout(self.verticalLayout_32)
+
+
+        self.verticalLayout_35.addWidget(self.groupBox_5)
+
+        self.tabWidget.addTab(self.tab_fun2, "")
+        self.tab = QWidget()
+        self.tab.setObjectName(u"tab")
+        self.verticalLayout_29 = QVBoxLayout(self.tab)
+        self.verticalLayout_29.setObjectName(u"verticalLayout_29")
+        self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_29.addItem(self.verticalSpacer_4)
+
+        self.groupBox_3 = QGroupBox(self.tab)
+        self.groupBox_3.setObjectName(u"groupBox_3")
+        self.groupBox_3.setStyleSheet(u"color: rgb(0, 0, 0);\n"
+"font: 12pt \"\u9ed1\u4f53\";")
+        self.horizontalLayout_32 = QHBoxLayout(self.groupBox_3)
+        self.horizontalLayout_32.setObjectName(u"horizontalLayout_32")
+        self.verticalLayout_33 = QVBoxLayout()
+        self.verticalLayout_33.setObjectName(u"verticalLayout_33")
+        self.lineEdit_Width = QLineEdit(self.groupBox_3)
+        self.lineEdit_Width.setObjectName(u"lineEdit_Width")
+        self.lineEdit_Width.setStyleSheet(u"")
+
+        self.verticalLayout_33.addWidget(self.lineEdit_Width)
+
+        self.lineEdit_Height = QLineEdit(self.groupBox_3)
+        self.lineEdit_Height.setObjectName(u"lineEdit_Height")
+        self.lineEdit_Height.setStyleSheet(u"color: rgb(0, 0, 0);")
+
+        self.verticalLayout_33.addWidget(self.lineEdit_Height)
+
+
+        self.horizontalLayout_32.addLayout(self.verticalLayout_33)
+
+        self.pushButton_Resize = QPushButton(self.groupBox_3)
+        self.pushButton_Resize.setObjectName(u"pushButton_Resize")
+        self.pushButton_Resize.setStyleSheet(u"background-color: rgb(255, 170, 127);\n"
+"color: rgb(0, 0, 0);\n"
+"font: 12pt \"\u9ed1\u4f53\";")
+        self.pushButton_Resize.setIconSize(QSize(16, 16))
+
+        self.horizontalLayout_32.addWidget(self.pushButton_Resize)
+
+        self.horizontalLayout_32.setStretch(0, 5)
+        self.horizontalLayout_32.setStretch(1, 3)
+
+        self.verticalLayout_29.addWidget(self.groupBox_3)
+
+        self.verticalSpacer = QSpacerItem(20, 41, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_29.addItem(self.verticalSpacer)
+
+        self.horizontalLayout_25 = QHBoxLayout()
+        self.horizontalLayout_25.setSpacing(5)
+        self.horizontalLayout_25.setObjectName(u"horizontalLayout_25")
+        self.verticalLayout_27 = QVBoxLayout()
+        self.verticalLayout_27.setObjectName(u"verticalLayout_27")
+        self.radioButton_Fangshe = QRadioButton(self.tab)
+        self.radioButton_Fangshe.setObjectName(u"radioButton_Fangshe")
+        self.radioButton_Fangshe.setStyleSheet(u"color: rgb(0, 0, 0);\n"
+"font: 12pt \"\u9ed1\u4f53\";")
+
+        self.verticalLayout_27.addWidget(self.radioButton_Fangshe)
+
+        self.radioButton_Toushi = QRadioButton(self.tab)
+        self.radioButton_Toushi.setObjectName(u"radioButton_Toushi")
+        self.radioButton_Toushi.setStyleSheet(u"color: rgb(0, 0, 0);\n"
+"font: 12pt \"\u9ed1\u4f53\";")
+
+        self.verticalLayout_27.addWidget(self.radioButton_Toushi)
+
+
+        self.horizontalLayout_25.addLayout(self.verticalLayout_27)
+
+        self.pushButton_fileSave_2 = QPushButton(self.tab)
+        self.pushButton_fileSave_2.setObjectName(u"pushButton_fileSave_2")
+        self.pushButton_fileSave_2.setMinimumSize(QSize(150, 30))
+        self.pushButton_fileSave_2.setFont(font)
+        self.pushButton_fileSave_2.setCursor(QCursor(Qt.PointingHandCursor))
+        self.pushButton_fileSave_2.setStyleSheet(u"background-color: rgb(52, 59, 72);")
+        self.pushButton_fileSave_2.setIcon(icon6)
+
+        self.horizontalLayout_25.addWidget(self.pushButton_fileSave_2)
+
+
+        self.verticalLayout_29.addLayout(self.horizontalLayout_25)
+
+        self.verticalSpacer_2 = QSpacerItem(20, 41, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_29.addItem(self.verticalSpacer_2)
+
+        self.horizontalLayout_14 = QHBoxLayout()
         self.horizontalLayout_14.setObjectName(u"horizontalLayout_14")
-        self.horizontalLayout_14.setContentsMargins(0, 0, 0, 0)
-        self.label_20 = QLabel(self.layoutWidget)
+        self.label_20 = QLabel(self.tab)
         self.label_20.setObjectName(u"label_20")
         self.label_20.setStyleSheet(u"color: rgb(0, 0, 0);\n"
 "font: 12pt \"\u9ed1\u4f53\";")
 
         self.horizontalLayout_14.addWidget(self.label_20)
 
-        self.horizontalSlider_3 = QSlider(self.layoutWidget)
-        self.horizontalSlider_3.setObjectName(u"horizontalSlider_3")
-        self.horizontalSlider_3.setOrientation(Qt.Horizontal)
+        self.horizontalSlider_Rotation = QSlider(self.tab)
+        self.horizontalSlider_Rotation.setObjectName(u"horizontalSlider_Rotation")
+        self.horizontalSlider_Rotation.setMaximum(719)
+        self.horizontalSlider_Rotation.setOrientation(Qt.Horizontal)
 
-        self.horizontalLayout_14.addWidget(self.horizontalSlider_3)
-
-        self.horizontalSlider_3.raise_()
-        self.label_20.raise_()
-        self.layoutWidget1 = QWidget(self.tab_fun2)
-        self.layoutWidget1.setObjectName(u"layoutWidget1")
-        self.layoutWidget1.setGeometry(QRect(10, 10, 130, 304))
-        self.verticalLayout_30 = QVBoxLayout(self.layoutWidget1)
-        self.verticalLayout_30.setObjectName(u"verticalLayout_30")
-        self.verticalLayout_30.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout_29 = QVBoxLayout()
-        self.verticalLayout_29.setObjectName(u"verticalLayout_29")
-        self.radioButton_6 = QRadioButton(self.layoutWidget1)
-        self.radioButton_6.setObjectName(u"radioButton_6")
-        self.radioButton_6.setStyleSheet(u"color: rgb(0, 0, 0);\n"
-"font: 12pt \"\u9ed1\u4f53\";")
-
-        self.verticalLayout_29.addWidget(self.radioButton_6)
-
-        self.radioButton_5 = QRadioButton(self.layoutWidget1)
-        self.radioButton_5.setObjectName(u"radioButton_5")
-        self.radioButton_5.setStyleSheet(u"color: rgb(0, 0, 0);\n"
-"font: 12pt \"\u9ed1\u4f53\";")
-
-        self.verticalLayout_29.addWidget(self.radioButton_5)
+        self.horizontalLayout_14.addWidget(self.horizontalSlider_Rotation)
 
 
-        self.verticalLayout_30.addLayout(self.verticalLayout_29)
+        self.verticalLayout_29.addLayout(self.horizontalLayout_14)
 
-        self.groupBox_3 = QGroupBox(self.layoutWidget1)
-        self.groupBox_3.setObjectName(u"groupBox_3")
-        self.groupBox_3.setStyleSheet(u"color: rgb(0, 0, 0);\n"
-"font: 12pt \"\u9ed1\u4f53\";")
-        self.gridLayout_3 = QGridLayout(self.groupBox_3)
-        self.gridLayout_3.setObjectName(u"gridLayout_3")
-        self.Sized_vertical = QSlider(self.groupBox_3)
-        self.Sized_vertical.setObjectName(u"Sized_vertical")
-        self.Sized_vertical.setOrientation(Qt.Vertical)
+        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.gridLayout_3.addWidget(self.Sized_vertical, 0, 0, 1, 1)
+        self.verticalLayout_29.addItem(self.verticalSpacer_3)
 
-        self.Sized_horizontal = QSlider(self.groupBox_3)
-        self.Sized_horizontal.setObjectName(u"Sized_horizontal")
-        self.Sized_horizontal.setOrientation(Qt.Horizontal)
-
-        self.gridLayout_3.addWidget(self.Sized_horizontal, 0, 1, 1, 1)
-
-
-        self.verticalLayout_30.addWidget(self.groupBox_3)
-
-        self.groupBox_4 = QGroupBox(self.layoutWidget1)
-        self.groupBox_4.setObjectName(u"groupBox_4")
-        self.groupBox_4.setStyleSheet(u"color: rgb(0, 0, 0);\n"
-"font: 12pt \"\u9ed1\u4f53\";")
-        self.gridLayout_4 = QGridLayout(self.groupBox_4)
-        self.gridLayout_4.setObjectName(u"gridLayout_4")
-        self.Sized_vertical_2 = QSlider(self.groupBox_4)
-        self.Sized_vertical_2.setObjectName(u"Sized_vertical_2")
-        self.Sized_vertical_2.setOrientation(Qt.Vertical)
-
-        self.gridLayout_4.addWidget(self.Sized_vertical_2, 0, 0, 1, 1)
-
-        self.Sized_horizontal_2 = QSlider(self.groupBox_4)
-        self.Sized_horizontal_2.setObjectName(u"Sized_horizontal_2")
-        self.Sized_horizontal_2.setOrientation(Qt.Horizontal)
-
-        self.gridLayout_4.addWidget(self.Sized_horizontal_2, 0, 1, 1, 1)
-
-
-        self.verticalLayout_30.addWidget(self.groupBox_4)
-
-        self.tabWidget.addTab(self.tab_fun2, "")
-        self.tab = QWidget()
-        self.tab.setObjectName(u"tab")
         self.tabWidget.addTab(self.tab, "")
         self.tab_2 = QWidget()
         self.tab_2.setObjectName(u"tab_2")
-        self.verticalLayout_27 = QVBoxLayout(self.tab_2)
-        self.verticalLayout_27.setObjectName(u"verticalLayout_27")
-        self.pushButton_fileOpen_3 = QPushButton(self.tab_2)
-        self.pushButton_fileOpen_3.setObjectName(u"pushButton_fileOpen_3")
-        self.pushButton_fileOpen_3.setMinimumSize(QSize(150, 30))
-        self.pushButton_fileOpen_3.setFont(font)
-        self.pushButton_fileOpen_3.setCursor(QCursor(Qt.PointingHandCursor))
-        self.pushButton_fileOpen_3.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        icon7 = QIcon()
-        icon7.addFile(u":/images/palette.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.pushButton_fileOpen_3.setIcon(icon7)
+        self.verticalLayout_38 = QVBoxLayout(self.tab_2)
+        self.verticalLayout_38.setObjectName(u"verticalLayout_38")
+        self.groupBox_4 = QGroupBox(self.tab_2)
+        self.groupBox_4.setObjectName(u"groupBox_4")
+        self.groupBox_4.setStyleSheet(u"color: rgb(0, 0, 0);\n"
+"font: 12pt \"\u9ed1\u4f53\";")
+        self.verticalLayout_36 = QVBoxLayout(self.groupBox_4)
+        self.verticalLayout_36.setObjectName(u"verticalLayout_36")
+        self.horizontalLayout_16 = QHBoxLayout()
+        self.horizontalLayout_16.setObjectName(u"horizontalLayout_16")
+        self.radioButton_AoTou = QRadioButton(self.groupBox_4)
+        self.radioButton_AoTou.setObjectName(u"radioButton_AoTou")
+        self.radioButton_AoTou.setStyleSheet(u"color: rgb(0, 0, 0);\n"
+"font: 12pt \"\u9ed1\u4f53\";")
 
-        self.verticalLayout_27.addWidget(self.pushButton_fileOpen_3)
+        self.horizontalLayout_16.addWidget(self.radioButton_AoTou)
 
-        self.horizontalLayout_25 = QHBoxLayout()
-        self.horizontalLayout_25.setObjectName(u"horizontalLayout_25")
-        self.radioButton_2 = QRadioButton(self.tab_2)
-        self.radioButton_2.setObjectName(u"radioButton_2")
-        icon8 = QIcon()
-        icon8.addFile(u":/images/brush.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.radioButton_2.setIcon(icon8)
-
-        self.horizontalLayout_25.addWidget(self.radioButton_2)
-
-        self.label_17 = QLabel(self.tab_2)
-        self.label_17.setObjectName(u"label_17")
-
-        self.horizontalLayout_25.addWidget(self.label_17)
-
-
-        self.verticalLayout_27.addLayout(self.horizontalLayout_25)
-
-        self.horizontalLayout_26 = QHBoxLayout()
-        self.horizontalLayout_26.setObjectName(u"horizontalLayout_26")
-        self.radioButton_3 = QRadioButton(self.tab_2)
-        self.radioButton_3.setObjectName(u"radioButton_3")
-        icon9 = QIcon()
-        icon9.addFile(u":/images/pen.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.radioButton_3.setIcon(icon9)
-
-        self.horizontalLayout_26.addWidget(self.radioButton_3)
-
-        self.label_18 = QLabel(self.tab_2)
-        self.label_18.setObjectName(u"label_18")
-
-        self.horizontalLayout_26.addWidget(self.label_18)
-
-
-        self.verticalLayout_27.addLayout(self.horizontalLayout_26)
-
-        self.horizontalLayout_27 = QHBoxLayout()
-        self.horizontalLayout_27.setObjectName(u"horizontalLayout_27")
-        self.radioButton_4 = QRadioButton(self.tab_2)
-        self.radioButton_4.setObjectName(u"radioButton_4")
-        icon10 = QIcon()
-        icon10.addFile(u":/images/Eraser.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.radioButton_4.setIcon(icon10)
-        self.radioButton_4.setIconSize(QSize(29, 29))
-
-        self.horizontalLayout_27.addWidget(self.radioButton_4)
-
-        self.label_19 = QLabel(self.tab_2)
-        self.label_19.setObjectName(u"label_19")
-
-        self.horizontalLayout_27.addWidget(self.label_19)
-
-
-        self.verticalLayout_27.addLayout(self.horizontalLayout_27)
-
-        self.horizontalLayout_28 = QHBoxLayout()
-        self.horizontalLayout_28.setObjectName(u"horizontalLayout_28")
-        self.label_16 = QLabel(self.tab_2)
-        self.label_16.setObjectName(u"label_16")
-
-        self.horizontalLayout_28.addWidget(self.label_16)
-
-        self.horizontalSlider_2 = QSlider(self.tab_2)
+        self.verticalLayout_30 = QVBoxLayout()
+        self.verticalLayout_30.setObjectName(u"verticalLayout_30")
+        self.horizontalSlider_2 = QSlider(self.groupBox_4)
         self.horizontalSlider_2.setObjectName(u"horizontalSlider_2")
         self.horizontalSlider_2.setOrientation(Qt.Horizontal)
 
-        self.horizontalLayout_28.addWidget(self.horizontalSlider_2)
+        self.verticalLayout_30.addWidget(self.horizontalSlider_2)
+
+        self.horizontalSlider_3 = QSlider(self.groupBox_4)
+        self.horizontalSlider_3.setObjectName(u"horizontalSlider_3")
+        self.horizontalSlider_3.setOrientation(Qt.Horizontal)
+
+        self.verticalLayout_30.addWidget(self.horizontalSlider_3)
+
+        self.horizontalSlider_4 = QSlider(self.groupBox_4)
+        self.horizontalSlider_4.setObjectName(u"horizontalSlider_4")
+        self.horizontalSlider_4.setOrientation(Qt.Horizontal)
+
+        self.verticalLayout_30.addWidget(self.horizontalSlider_4)
 
 
-        self.verticalLayout_27.addLayout(self.horizontalLayout_28)
+        self.horizontalLayout_16.addLayout(self.verticalLayout_30)
 
+
+        self.verticalLayout_36.addLayout(self.horizontalLayout_16)
+
+        self.horizontalLayout_26 = QHBoxLayout()
+        self.horizontalLayout_26.setObjectName(u"horizontalLayout_26")
+        self.radioButton_TuTou = QRadioButton(self.groupBox_4)
+        self.radioButton_TuTou.setObjectName(u"radioButton_TuTou")
+        self.radioButton_TuTou.setStyleSheet(u"color: rgb(0, 0, 0);\n"
+"font: 12pt \"\u9ed1\u4f53\";")
+
+        self.horizontalLayout_26.addWidget(self.radioButton_TuTou)
+
+        self.verticalLayout_34 = QVBoxLayout()
+        self.verticalLayout_34.setObjectName(u"verticalLayout_34")
+        self.horizontalSlider_5 = QSlider(self.groupBox_4)
+        self.horizontalSlider_5.setObjectName(u"horizontalSlider_5")
+        self.horizontalSlider_5.setOrientation(Qt.Horizontal)
+
+        self.verticalLayout_34.addWidget(self.horizontalSlider_5)
+
+        self.horizontalSlider_6 = QSlider(self.groupBox_4)
+        self.horizontalSlider_6.setObjectName(u"horizontalSlider_6")
+        self.horizontalSlider_6.setOrientation(Qt.Horizontal)
+
+        self.verticalLayout_34.addWidget(self.horizontalSlider_6)
+
+        self.horizontalSlider_7 = QSlider(self.groupBox_4)
+        self.horizontalSlider_7.setObjectName(u"horizontalSlider_7")
+        self.horizontalSlider_7.setOrientation(Qt.Horizontal)
+
+        self.verticalLayout_34.addWidget(self.horizontalSlider_7)
+
+
+        self.horizontalLayout_26.addLayout(self.verticalLayout_34)
+
+
+        self.verticalLayout_36.addLayout(self.horizontalLayout_26)
+
+        self.horizontalLayout_27 = QHBoxLayout()
+        self.horizontalLayout_27.setObjectName(u"horizontalLayout_27")
+        self.radioButton_CaoTu = QRadioButton(self.groupBox_4)
+        self.radioButton_CaoTu.setObjectName(u"radioButton_CaoTu")
+        self.radioButton_CaoTu.setStyleSheet(u"color: rgb(0, 0, 0);\n"
+"font: 12pt \"\u9ed1\u4f53\";")
+
+        self.horizontalLayout_27.addWidget(self.radioButton_CaoTu)
+
+        self.radioButton_NONE = QRadioButton(self.groupBox_4)
+        self.radioButton_NONE.setObjectName(u"radioButton_NONE")
+        self.radioButton_NONE.setStyleSheet(u"color: rgb(0, 0, 0);\n"
+"font: 12pt \"\u9ed1\u4f53\";")
+
+        self.horizontalLayout_27.addWidget(self.radioButton_NONE)
+
+
+        self.verticalLayout_36.addLayout(self.horizontalLayout_27)
+
+
+        self.verticalLayout_38.addWidget(self.groupBox_4)
+
+        self.groupBox_6 = QGroupBox(self.tab_2)
+        self.groupBox_6.setObjectName(u"groupBox_6")
+        self.groupBox_6.setStyleSheet(u"color: rgb(0, 0, 0);\n"
+"font: 12pt \"\u9ed1\u4f53\";")
+        self.verticalLayout_37 = QVBoxLayout(self.groupBox_6)
+        self.verticalLayout_37.setObjectName(u"verticalLayout_37")
+        self.horizontalLayout_28 = QHBoxLayout()
+        self.horizontalLayout_28.setObjectName(u"horizontalLayout_28")
+        self.pushButton_2 = QPushButton(self.groupBox_6)
+        self.pushButton_2.setObjectName(u"pushButton_2")
+        self.pushButton_2.setStyleSheet(u"background-color: rgb(255, 170, 127);")
+
+        self.horizontalLayout_28.addWidget(self.pushButton_2)
+
+        self.horizontalSpacer_6 = QSpacerItem(18, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_28.addItem(self.horizontalSpacer_6)
+
+        self.pushButton_3 = QPushButton(self.groupBox_6)
+        self.pushButton_3.setObjectName(u"pushButton_3")
+        self.pushButton_3.setStyleSheet(u"background-color: rgb(255, 170, 127);")
+
+        self.horizontalLayout_28.addWidget(self.pushButton_3)
+
+        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_28.addItem(self.horizontalSpacer_7)
+
+        self.pushButton_4 = QPushButton(self.groupBox_6)
+        self.pushButton_4.setObjectName(u"pushButton_4")
+        self.pushButton_4.setStyleSheet(u"background-color: rgb(255, 170, 127);")
+
+        self.horizontalLayout_28.addWidget(self.pushButton_4)
+
+
+        self.verticalLayout_37.addLayout(self.horizontalLayout_28)
+
+        self.pushButton_fileSave_3 = QPushButton(self.groupBox_6)
+        self.pushButton_fileSave_3.setObjectName(u"pushButton_fileSave_3")
+        self.pushButton_fileSave_3.setMinimumSize(QSize(150, 30))
+        font5 = QFont()
+        font5.setFamilies([u"\u9ed1\u4f53"])
+        font5.setPointSize(12)
+        font5.setBold(False)
+        font5.setItalic(False)
+        self.pushButton_fileSave_3.setFont(font5)
+        self.pushButton_fileSave_3.setCursor(QCursor(Qt.PointingHandCursor))
+        self.pushButton_fileSave_3.setStyleSheet(u"background-color: rgb(52, 59, 72);")
+        self.pushButton_fileSave_3.setIcon(icon6)
+
+        self.verticalLayout_37.addWidget(self.pushButton_fileSave_3)
+
+
+        self.verticalLayout_38.addWidget(self.groupBox_6)
+
+        self.verticalLayout_38.setStretch(0, 4)
+        self.verticalLayout_38.setStretch(1, 1)
         self.tabWidget.addTab(self.tab_2, "")
+        self.tab_5 = QWidget()
+        self.tab_5.setObjectName(u"tab_5")
+        self.tabWidget.addTab(self.tab_5, "")
 
         self.verticalLayout_24.addWidget(self.tabWidget)
 
         self.verticalLayout_24.setStretch(0, 1)
-        self.verticalLayout_24.setStretch(1, 8)
 
         self.verticalLayout_25.addLayout(self.verticalLayout_24)
 
@@ -2067,11 +2279,11 @@ class Ui_MainWindow(object):
         self.creditsLabel = QLabel(self.bottomBar)
         self.creditsLabel.setObjectName(u"creditsLabel")
         self.creditsLabel.setMaximumSize(QSize(16777215, 16))
-        font5 = QFont()
-        font5.setFamilies([u"Segoe UI"])
-        font5.setBold(False)
-        font5.setItalic(False)
-        self.creditsLabel.setFont(font5)
+        font6 = QFont()
+        font6.setFamilies([u"Segoe UI"])
+        font6.setBold(False)
+        font6.setItalic(False)
+        self.creditsLabel.setFont(font6)
         self.creditsLabel.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
 
         self.horizontalLayout_5.addWidget(self.creditsLabel)
@@ -2109,7 +2321,7 @@ class Ui_MainWindow(object):
 
         self.stackedWidget.setCurrentIndex(3)
         self.tabWidget_2.setCurrentIndex(1)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(3)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -2250,32 +2462,55 @@ class Ui_MainWindow(object):
         self.pushButton_fileSave.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58", None))
         self.label_3.setText("")
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"\u4eae\u5ea6", None))
-        self.label_11.setText(QCoreApplication.translate("MainWindow", u"\u66dd\u5149", None))
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"\u9971\u548c\u5ea6", None))
         self.label_8.setText(QCoreApplication.translate("MainWindow", u"\u5bf9\u6bd4\u5ea6", None))
-        self.label_12.setText(QCoreApplication.translate("MainWindow", u"\u8272\u8c03", None))
+        self.label_12.setText(QCoreApplication.translate("MainWindow", u"\u8272\u76f8", None))
         self.label_13.setText(QCoreApplication.translate("MainWindow", u"\u8272\u6e29", None))
         self.label_9.setText(QCoreApplication.translate("MainWindow", u"\u9510\u5316", None))
         self.label_10.setText(QCoreApplication.translate("MainWindow", u"\u9897\u7c92", None))
         self.label_14.setText(QCoreApplication.translate("MainWindow", u"\u7eb9\u7406", None))
         self.label_15.setText(QCoreApplication.translate("MainWindow", u"\u9634\u5f71", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_rendering), QCoreApplication.translate("MainWindow", u"\u6e32\u67d3", None))
+        self.groupBox_5.setTitle(QCoreApplication.translate("MainWindow", u"\u6ee4\u955c\u98ce\u683c", None))
+        self.Button_Style_9.setText(QCoreApplication.translate("MainWindow", u"Hot", None))
+        self.Button_Style_10.setText(QCoreApplication.translate("MainWindow", u"Cool", None))
+        self.Button_Style_11.setText(QCoreApplication.translate("MainWindow", u"Rainbow", None))
+        self.Button_Style_12.setText(QCoreApplication.translate("MainWindow", u"Pink", None))
+        self.Button_Style_5.setText(QCoreApplication.translate("MainWindow", u"Spring", None))
+        self.Button_Style_6.setText(QCoreApplication.translate("MainWindow", u"Summer", None))
+        self.Button_Style_7.setText(QCoreApplication.translate("MainWindow", u"Winter", None))
+        self.Button_Style_8.setText(QCoreApplication.translate("MainWindow", u"Ocean", None))
+        self.Button_Style_1.setText(QCoreApplication.translate("MainWindow", u"Autumn", None))
+        self.Button_Style_2.setText(QCoreApplication.translate("MainWindow", u"Bone", None))
+        self.Button_Style_3.setText(QCoreApplication.translate("MainWindow", u"Jet", None))
+        self.Button_Style_4.setText(QCoreApplication.translate("MainWindow", u"Hsv", None))
+        self.Button_Style_14.setText(QCoreApplication.translate("MainWindow", u"\u5361\u901a\u753b", None))
+        self.Button_Style_13.setText(QCoreApplication.translate("MainWindow", u"\u8349\u56fe", None))
+        self.Button_Style_15.setText(QCoreApplication.translate("MainWindow", u"\u65e0", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_fun2), QCoreApplication.translate("MainWindow", u"\u98ce\u683c", None))
+        self.groupBox_3.setTitle(QCoreApplication.translate("MainWindow", u"\u5c3a\u5bf8\u53d8\u6362", None))
+        self.lineEdit_Width.setText("")
+        self.lineEdit_Width.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\u5bbd\uff1a", None))
+        self.lineEdit_Height.setText("")
+        self.lineEdit_Height.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\u9ad8\uff1a", None))
+        self.pushButton_Resize.setText(QCoreApplication.translate("MainWindow", u"resize", None))
+        self.radioButton_Fangshe.setText(QCoreApplication.translate("MainWindow", u"\u4eff\u5c04\u53d8\u6362", None))
+        self.radioButton_Toushi.setText(QCoreApplication.translate("MainWindow", u"\u900f\u89c6\u53d8\u6362", None))
+        self.pushButton_fileSave_2.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58\u900f\u660e\u56fe\u50cf", None))
         self.label_20.setText(QCoreApplication.translate("MainWindow", u"\u65cb\u8f6c", None))
-        self.radioButton_6.setText(QCoreApplication.translate("MainWindow", u"\u4eff\u5c04\u53d8\u6362", None))
-        self.radioButton_5.setText(QCoreApplication.translate("MainWindow", u"\u900f\u89c6\u53d8\u6362", None))
-        self.groupBox_3.setTitle(QCoreApplication.translate("MainWindow", u"\u7f29\u653e", None))
-        self.groupBox_4.setTitle(QCoreApplication.translate("MainWindow", u"\u5e73\u79fb", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_fun2), QCoreApplication.translate("MainWindow", u"\u88c1\u526a", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"\u6ee4\u955c", None))
-        self.pushButton_fileOpen_3.setText(QCoreApplication.translate("MainWindow", u"\u989c\u8272", None))
-        self.radioButton_2.setText("")
-        self.label_17.setText(QCoreApplication.translate("MainWindow", u"\u5237\u5b50", None))
-        self.radioButton_3.setText("")
-        self.label_18.setText(QCoreApplication.translate("MainWindow", u"\u94a2\u7b14", None))
-        self.radioButton_4.setText("")
-        self.label_19.setText(QCoreApplication.translate("MainWindow", u"\u6a61\u76ae", None))
-        self.label_16.setText(QCoreApplication.translate("MainWindow", u"\u5927\u5c0f", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("MainWindow", u"\u6d82\u9e26", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"\u88c1\u526a", None))
+        self.groupBox_4.setTitle(QCoreApplication.translate("MainWindow", u"\u7279\u6548", None))
+        self.radioButton_AoTou.setText(QCoreApplication.translate("MainWindow", u"\u51f9\u900f\u955c", None))
+        self.radioButton_TuTou.setText(QCoreApplication.translate("MainWindow", u"\u51f8\u900f\u955c", None))
+        self.radioButton_CaoTu.setText(QCoreApplication.translate("MainWindow", u"\u751f\u6210\u8349\u56fe", None))
+        self.radioButton_NONE.setText(QCoreApplication.translate("MainWindow", u"\u65e0\u7279\u6548", None))
+        self.groupBox_6.setTitle(QCoreApplication.translate("MainWindow", u"\u533a\u57df\u7279\u6548", None))
+        self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"\u9a6c\u8d5b\u514b", None))
+        self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"\u56fe\u50cf\u5206\u5272", None))
+        self.pushButton_4.setText(QCoreApplication.translate("MainWindow", u"\u53bb\u9664\u7269\u4f53", None))
+        self.pushButton_fileSave_3.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58\u900f\u660e\u56fe\u50cf", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("MainWindow", u"\u7279\u6548", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), QCoreApplication.translate("MainWindow", u"\u6587\u5b57", None))
         self.btn_message.setText(QCoreApplication.translate("MainWindow", u"Message", None))
         self.btn_print.setText(QCoreApplication.translate("MainWindow", u"Print", None))
         self.btn_logout.setText(QCoreApplication.translate("MainWindow", u"Logout", None))
